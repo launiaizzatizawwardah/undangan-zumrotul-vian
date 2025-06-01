@@ -18,55 +18,64 @@ export default function QRScanner({ attendees, setAttendees }) {
   useEffect(() => {
     const savedUUIDs = JSON.parse(localStorage.getItem("scannedUUIDs")) || [];
     setScannedUUIDs(new Set(savedUUIDs));
-    beepRef.current = new Audio("/beep.mp3");
+
+    try {
+      beepRef.current = new Audio("/beep.mp3");
+    } catch {
+      console.warn("Beep sound not found.");
+    }
   }, []);
 
   const processQRData = (decodedText) => {
+    let parsed;
     try {
-      const data = JSON.parse(decodedText);
-      const { uuid, name, phone, guests, table } = data;
-
-      if (!uuid) return;
-
-      if (scannedUUIDs.has(uuid)) {
-        setError("❌ QR sudah pernah discan sebelumnya.");
-        return;
-      }
-
-      const updatedUUIDs = new Set(scannedUUIDs);
-      updatedUUIDs.add(uuid);
-      setScannedUUIDs(updatedUUIDs);
-      localStorage.setItem("scannedUUIDs", JSON.stringify([...updatedUUIDs]));
-
-      const newGuest = {
-        uuid,
-        name,
-        phone,
-        guests,
-        table,
-        time: new Date().toLocaleString(),
-      };
-
-      setAttendees((prev) => {
-        const updated = [...prev, newGuest];
-        localStorage.setItem("attendees", JSON.stringify(updated));
-        return updated;
-      });
-
-      if (beepRef.current) beepRef.current.play();
-      setError(null);
-      setSuccessMessage("✅ Scan berhasil!");
-      setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (e) {
-      setError("QR tidak valid atau rusak");
-      console.error("Parse error:", e);
+      parsed = JSON.parse(decodedText);
+    } catch {
+      setError("❌ QR tidak valid!");
+      return;
     }
+
+    const { uuid, name = "", phone = "", guests = 0, table = "" } = parsed;
+
+    if (!uuid) {
+      setError("❌ Data QR tidak lengkap.");
+      return;
+    }
+
+    if (scannedUUIDs.has(uuid)) {
+      setError("❌ QR sudah pernah discan.");
+      return;
+    }
+
+    const newGuest = {
+      uuid,
+      name,
+      phone,
+      guests,
+      table,
+      time: new Date().toLocaleString(),
+    };
+
+    const updatedUUIDs = new Set(scannedUUIDs);
+    updatedUUIDs.add(uuid);
+    setScannedUUIDs(updatedUUIDs);
+    localStorage.setItem("scannedUUIDs", JSON.stringify([...updatedUUIDs]));
+
+    setAttendees((prev) => {
+      const updated = [...prev, newGuest];
+      localStorage.setItem("attendees", JSON.stringify(updated));
+      return updated;
+    });
+
+    if (beepRef.current) beepRef.current.play();
+    setSuccessMessage("✅ Scan berhasil!");
+    setError(null);
+    setTimeout(() => setSuccessMessage(null), 3000);
   };
 
   const startScanner = () => {
-    const config = { fps: 10, qrbox: { width: 400, height: 400 } };
-
     if (!containerRef.current) return;
+
     const scanner = new Html5Qrcode(containerRef.current.id);
     scannerRef.current = scanner;
 
@@ -75,7 +84,7 @@ export default function QRScanner({ attendees, setAttendees }) {
         if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
         return scanner.start(
           devices[0].id,
-          config,
+          { fps: 10, qrbox: { width: 300, height: 350 } },
           (decodedText) => {
             const now = Date.now();
             if (now - lastScanTimeRef.current < 3000) return;
@@ -89,9 +98,7 @@ export default function QRScanner({ attendees, setAttendees }) {
           }
         );
       })
-      .then(() => {
-        setIsCameraOn(true);
-      })
+      .then(() => setIsCameraOn(true))
       .catch((err) => {
         console.error("Gagal mulai kamera:", err);
         setError("Gagal menginisialisasi kamera.");
@@ -114,9 +121,14 @@ export default function QRScanner({ attendees, setAttendees }) {
     }
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
     if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("❌ Hanya gambar yang diperbolehkan.");
+      return;
+    }
 
     const html5QrCode = new Html5Qrcode("qr-reader-temp");
     html5QrCode
@@ -124,36 +136,37 @@ export default function QRScanner({ attendees, setAttendees }) {
       .then(processQRData)
       .catch((err) => {
         console.error("Image scan error:", err);
-        setError("Gagal membaca QR dari gambar");
+        setError("❌ Gagal membaca QR dari gambar.");
       });
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-center text-green-700">
-          Scan Kehadiran Tamu
+    <div className="min-h-screen bg-gradient-to-tr from-pink-100 to-white p-6">
+      <div className="max-w-xl mx-auto space-y-6">
+        <h1 className="text-4xl font-serif text-center text-rose-700 mb-2">
+          💍 Scan Kehadiran Tamu
         </h1>
+        <p className="text-center text-gray-500 text-sm italic">Selamat datang di acara pernikahan, silakan scan tiket Anda 🎉</p>
 
-        <div className="bg-white rounded-lg shadow-md p-4 relative">
+        <div className="bg-white rounded-2xl shadow-lg p-6 relative border border-pink-200">
           {successMessage && (
             <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded shadow z-50">
-              ✅ {successMessage}
+              {successMessage}
             </div>
           )}
 
-          <div className="flex justify-center gap-2 mb-4 flex-wrap">
+          <div className="flex justify-center gap-3 mb-4 flex-wrap">
             {!isCameraOn ? (
               <button
                 onClick={startScanner}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                className="px-6 py-3 bg-rose-600 text-white rounded-lg shadow-md hover:bg-rose-700 transition-all"
               >
                 🎥 Nyalakan Kamera
               </button>
             ) : (
               <button
                 onClick={stopScanner}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-6 py-3 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-all"
               >
                 ❌ Matikan Kamera
               </button>
@@ -161,33 +174,60 @@ export default function QRScanner({ attendees, setAttendees }) {
 
             <button
               onClick={() => navigate("/attendance")}
-              className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"
+              className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-900 transition-all"
             >
               📋 Lihat Kehadiran
             </button>
           </div>
 
+          {isCameraOn && (
+            <p className="text-sm text-rose-600 text-center mb-2 font-semibold">
+              Kamera aktif, arahkan ke QR code tiket Anda.
+            </p>
+          )}
+
           <div
             id="qr-reader"
             ref={containerRef}
-            className="relative w-full h-[400px] border border-green-500 rounded overflow-hidden"
+            className="relative w-full h-[300px] border-4 border-dashed border-rose-400 rounded-xl overflow-hidden bg-gray-50 shadow-inner"
           ></div>
 
           <div id="qr-reader-temp" style={{ display: "none" }}></div>
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="mt-4 block"
-          />
+          <label className="mt-4 block w-full cursor-pointer text-center bg-emerald-500 text-white py-3 rounded-lg hover:bg-emerald-600 transition-all">
+            📁 Upload Gambar QR
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </label>
 
-          {error && <p className="text-red-600 mt-2">{error}</p>}
+          <button
+            onClick={() => navigate("/log")}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-center w-full mt-4"
+          >
+            🕒 Riwayat Scan
+          </button>
+
+          {/* <div className="text-center text-sm"> */}
+          <button
+            onClick={() => navigate("/created-log")}
+            className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-blue-700 text-center w-full mt-4"
+          >
+            🎲 Riwayat Pembuat QR
+          </button>
+        {/* </div> */}
+
+
+          {error && (
+            <div className="mt-4 bg-red-100 text-red-700 p-3 rounded-md text-center font-semibold">
+              {error}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
-}
-
-
-// kode terakhir
+};
