@@ -1,4 +1,5 @@
 export default {
+  darkMode: 'class', // ⬅️ Tambahkan ini di sini
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",

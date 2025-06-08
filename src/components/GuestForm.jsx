@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import QRCode from "react-qr-code";
 import domtoimage from "dom-to-image-more";
 import html2canvas from "html2canvas";
+import { useNavigate } from "react-router-dom"; 
 import { v4 as uuidv4 } from "uuid";
 import '../App.css'
 import {
@@ -33,6 +34,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const tableOptions = ["REGULAR", "VIP ⭐", "VVIP ⭐⭐"];
+  // const [manualMode, setManualMode] = useState(false)
+  const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -88,8 +92,8 @@ function App() {
   const [countdown, setCountdown] = useState("");
 
 useEffect(() => {
-  const targetDate = new Date("2025-07-15T18:00:00"); // Ganti sesuai tanggal acara
-  const interval = setInterval(() => {
+    const targetDate = new Date("2025-07-06T18:00:00"); // Ganti sesuai tanggal acara
+    const interval = setInterval(() => {
     const now = new Date();
     const distance = targetDate - now;
 
@@ -112,9 +116,23 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
+// untuk handle click outside dropdown
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".dropdown-table")) {
+      setShowDropdown(false);
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
 
-  // untuk handle download 
+
+
+// untuk handle download 
 const handleDownload = async () => {
   if (!qrRef.current) return;
 
@@ -142,11 +160,13 @@ const handleDownload = async () => {
   }
 };
 
-  // untuk handle download fullticket 
+
+// untuk handle download fullticket 
 const handleDownloadFullTicket = async () => {
   if (!ticketRef.current) return;
 
-  // Scroll dan blur agar tidak ada elemen aktif
+
+// Scroll dan blur agar tidak ada elemen aktif
   window.scrollTo(0, 0);
   if (document.activeElement) document.activeElement.blur();
 
@@ -178,7 +198,7 @@ const handleDownloadFullTicket = async () => {
 
 
 
-  // untuk handle reset form 
+// untuk handle reset form 
   const handleReset = () => {
     setData({
       name: "",
@@ -189,7 +209,7 @@ const handleDownloadFullTicket = async () => {
     setUuid(uuidv4());
     setSubmitted(false);
     toast.info("Form telah direset!", {
-      position: "top-right  ",
+      position: "top-right",
       autoClose: 2000,
     });
   };
@@ -233,15 +253,17 @@ Saya Sudah Mengisi Form Dan Membuat Kode QR Dan Akan Di Scan Di Acara Pernikahan
           <div className="text-center mb-4">
             
             <h1 className="text-5xl font-bold text-white mb-4 -mt-6">
-              Wedding Book
+              📖 Wedding Book
             </h1>
             <div className="text-sm text-yellow-400 font-mono mb-2 animate-pulse">
               ⏳ Menuju Acara: {countdown}
             </div>
-            <h1 className="text-xl font-bold text-yellow-400 mb-2">
-              DHITO & MARWAN
+            <div className="flex items-center justify-center">
+            <h1 className="text-2xl font-bold text-yellow-400 mb-2 uppercase text-center">
+              ANDHITO & DINI
             </h1>
-            <p className="text-sm text-gray-400">31 Mei 2025 - 18:00 WIB</p>
+            </div>
+            <p className="text-sm text-gray-400">06 Juli 2025 - 14:00 WIB</p>
           </div>
 
           <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-2xl">
@@ -260,7 +282,7 @@ Saya Sudah Mengisi Form Dan Membuat Kode QR Dan Akan Di Scan Di Acara Pernikahan
           <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-2xl">
             <FaPhone className="text-yellow-400 text-xl" />
             <input
-              type="tel"
+              type="number"
               name="phone"
               required
               placeholder="No. HP"
@@ -284,7 +306,7 @@ Saya Sudah Mengisi Form Dan Membuat Kode QR Dan Akan Di Scan Di Acara Pernikahan
             />
           </div>
 
-          <div className="relative">
+          <div className="relative dropdown-table">
             <div
               className="flex items-center justify-between bg-gray-800 p-4 rounded-2xl cursor-pointer"
               onClick={() => setShowDropdown(!showDropdown)}
@@ -337,9 +359,18 @@ Saya Sudah Mengisi Form Dan Membuat Kode QR Dan Akan Di Scan Di Acara Pernikahan
             {loading ? "Membuat Tiket..." : "Buat Tiket"}
           </button>
 
+          <button
+          type="button"
+          onClick={() => navigate("/manualGuestForm")}
+          className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+        >
+          📋 Isi Form Manual
+        </button>
+
+
           <div className="text-center text-sm pt-2">
             <a
-              href="https://maps.app.goo.gl/vwxceNtzroy24jfE7"
+              href="https://maps.app.goo.gl/b43k9xYgdStqRzL26"
               target="_blank"
               className="text-yellow-400 hover:underline flex items-center justify-center gap-1"
               rel="noreferrer"
@@ -364,18 +395,18 @@ Saya Sudah Mengisi Form Dan Membuat Kode QR Dan Akan Di Scan Di Acara Pernikahan
             <div className="p-6 flex justify-between items-center">
               <div className="space-y-2 text-base">
                 <p>
-                  <span className="text-gray-400 uppercase text-lg">Nama :</span><br></br><span className="font-semibold uppercase">{data.name}</span>
+                  <span className="text-gray-400 uppercase font-bold">Nama :</span><br></br><span className="font-semibold uppercase">{data.name}</span>
                 </p>
                 <p>
-                  <span className="text-gray-400 uppercase">NO HANDPHONE:</span><br></br><span className="font-semibold">{data.phone}</span>
+                  <span className="text-gray-400 uppercase font-bold">NO HANDPHONE:</span><br></br><span className="font-semibold">{data.phone}</span>
                 </p>
                 <p>
-                  <span className="text-gray-400 uppercase">Jumlah Tamu:</span><br></br><span className="font-bold">{data.guests}</span> <span className="font-semibold uppercase">tamu</span>
+                  <span className="text-gray-400 uppercase font-bold">Jumlah Tamu:</span><br></br><span className="font-bold">{data.guests}</span> <span className="font-semibold uppercase">tamu</span>
                 </p>
                 <p>
-                  <span className="text-gray-400 uppercase">Kategori:</span><br></br> <span className={`font-bold px-2 py-1 rounded inline-block
-                  ${data.table === "VVIP ⭐⭐" ? "bg-gradient-to-r from-yellow-300 to-yellow-500 text-black" : ""}
-                  ${data.table === "VIP ⭐" ? "bg-yellow-400 text-black" : ""}
+                  <span className="text-gray-400 uppercase font-bold">Kategori:</span><br></br> <span className={`font-bold px-2 py-1 rounded inline-block
+                  ${data.table === "VVIP ⭐⭐" ? "bg-gradient-to-r from-yellow-200 to-yellow-500 text-black" : ""}
+                  ${data.table === "VIP ⭐" ? "bg-yellow-300 text-black" : ""}
                   ${data.table === "REGULAR" ? "bg-gray-700 text-white" : ""}`}>
                   {data.table}
                 </span>
@@ -402,11 +433,11 @@ Saya Sudah Mengisi Form Dan Membuat Kode QR Dan Akan Di Scan Di Acara Pernikahan
             <div className="p-6 flex justify-between text-sm text-gray-400">
               <div>
                 <p>Tanggal</p>
-                <p>31 Mei 2025</p>
+                <p>06 Juli 2025</p>
               </div>
               <div>
                 <p>Waktu</p>
-                <p>18:00 WIB</p>
+                <p>14:00 WIB</p>
               </div>
               <div>
                 <p>Kode</p>
