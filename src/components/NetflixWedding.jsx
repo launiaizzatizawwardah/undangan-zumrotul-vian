@@ -317,7 +317,7 @@ const [sliderRef, instanceRef] = useKeenSlider({
             <img
               src="/dito2.jpg"
               alt="Poster Dito & Dini"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover object-top"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
             <div className="relative z-10 flex flex-col justify-end items-start h-full p-6 md:p-16 text-left">
