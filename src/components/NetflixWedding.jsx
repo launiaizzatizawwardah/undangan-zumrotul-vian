@@ -358,21 +358,21 @@ const [sliderRef, instanceRef] = useKeenSlider({
         </motion.div>
           
         {/* Hero */}
-        {/* <section id="hero" className="bg-white dark:bg-black text-white pt-20 pb-10 px-6 dark:text-white"> */}
+        <section id="hero" className="bg-white dark:bg-black text-white pt-20 pb-10 px-6 dark:text-white">
             {/* Video Trailer */}
-            {/* <div className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-xl">
+            <div className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-xl">
                 <video
                 className="w-full h-auto object-cover"
                 src="/video-prewed.mp4"
                 poster="/thumbnail-prewed.jpg"
                 controls
-                /> */}
-            {/* </div> */}
+                />
+             </div>
 
 
 
         {/* Detail Info ala Netflix */}
-        {/* <div className="max-w-4xl mx-auto mt-10 bg-white dark:bg-black dark:text-white text-black">
+        <div className="max-w-4xl mx-auto mt-10 bg-white dark:bg-black dark:text-white text-black">
                 <p className="text-red-500 font-semibold text-sm mb-1">N <span className="text-gray-400">DOCUMENTARY</span></p>
                 <h1 className="text-3xl md:text-4xl font-bold mb-2">Dhito & Dini: Sebelum Hari H</h1>
 
@@ -399,7 +399,7 @@ const [sliderRef, instanceRef] = useKeenSlider({
                 <span className="text-xs">– Q.S. Az-Zariyah: 49</span>
                 </p>
         </div>
-        </section> */}
+        </section>
         {/* poster prewed */}
         <section className="bg-white dark:bg-black text-black dark:text-white px-6 py-16">
       {/* <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">🎬 Koleksi Poster Prewed</h2> */}
@@ -654,7 +654,7 @@ const [sliderRef, instanceRef] = useKeenSlider({
             Kami sangat berharap kehadiranmu di hari bahagia kami. Silakan isi form konfirmasi kehadiran berikut:
             </p>
             <a
-            href="http://localhost:5173/guest-form" // GANTI DENGAN LINK FORM KAMU
+            href="https://dito-project-iota.vercel.app/guest-form" // GANTI DENGAN LINK FORM KAMU
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block mt-4 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full text-lg shadow-lg transition"
