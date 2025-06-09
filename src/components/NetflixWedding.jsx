@@ -223,8 +223,8 @@ const [sliderRef, instanceRef] = useKeenSlider({
         <section 
         ref={introContainerRef}
         className="fixed inset-0 bg-white dark:bg-black dark:text-black text-black flex flex-col items-center justify-center z-40">
-    <h1 className="text-4xl font-bold mb-4 text-red-600">NIKAHFIX</h1>
-    <p className="text-lg mb-6">Who's Invited?</p>
+    <h1 className="text-4xl font-bold mb-4 text-red-600 font-bebas">N I K A H Y U K </h1>
+    <p className="text-lg mb-6 dark:text-white">Who's Invited?</p>
 
     {/* Avatar + Input */}
     <div className="flex flex-col items-center mb-4">
@@ -274,12 +274,12 @@ const [sliderRef, instanceRef] = useKeenSlider({
               />
             ))}
             <motion.h1
-              className="text-5xl font-bold text-red-600 z-10"
+              className="text-8xl font-bold text-red-600 z-10 font-bebas"
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1.5 }}
             >
-              NIKAHFIX
+              N I K A H Y U K
             </motion.h1>
             {introFinished && (
               <motion.button
@@ -322,7 +322,7 @@ const [sliderRef, instanceRef] = useKeenSlider({
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
             <div className="relative z-10 flex flex-col justify-end items-start h-full p-6 md:p-16 text-left">
               <motion.span
-                className="text-5xl font-bold text-red-600 z-10"
+                className="text-5xl font-bold text-red-600 z-10 font"
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 1.5 }}

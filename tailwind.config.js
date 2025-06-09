@@ -18,7 +18,9 @@ export default {
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
+        bebas: ["Bebas Neue", "sans-serif"],
       },
+
     },
   },
   plugins: [],
