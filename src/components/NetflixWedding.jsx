@@ -272,7 +272,7 @@ useEffect(() => {
     {/* RSVP Button */}
     <div className="absolute top-4 left-4 z-50">
       <a
-    href="https://forms.https://dito-project-git-master-parlisaastens-projects.vercel.app/guest-form/YOUR_FORM_LINK"
+    href="https://dito-project-iota.vercel.app/guest-form"
     target="_blank"
     rel="noopener noreferrer"
     className="bg-white text-black px-4 py-2 rounded font-semibold shadow inline-block"
