@@ -4,6 +4,7 @@ import QRScanner from "./components/QRScanner";
 import Attendance from "./components/Attendance";
 import NetflixWedding from "./components/NetflixWedding";
 import ManualGuestForm from "./components/ManualGuestForm";
+import Website from "./components/Website";
 import useLocalStorage from "./components/useLocalStorage"; // ganti path sesuai struktur Anda
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         />
         <Route path="/manualGuestForm" element={<ManualGuestForm />} />
         <Route path="/NetflixWedding" element={<NetflixWedding />} />
+        <Route path="/contoh" element={<Website />} />
       </Routes>
     </Router>
   );

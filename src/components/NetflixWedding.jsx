@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaPlay, FaVolumeMute, FaVolumeUp, FaChevronDown } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import "keen-slider/keen-slider.min.css";
-import { useKeenSlider } from "keen-slider/react";
 import { supabase } from '../lib/supabaseClient'; // atau sesuaikan path-nya
 
 export default function WeddingInvitation() {
@@ -12,58 +10,67 @@ export default function WeddingInvitation() {
   const [isMuted, setIsMuted] = useState(false);
   const [countdown, setCountdown] = useState('');
   const audioRef = useRef(null);
+  const [wishes, setWishes] = useState([]); 
   const [guestName, setGuestName] = useState('');
-  const [isGuestConfirmed, setIsGuestConfirmed] = useState(false);
-  const [wishes, setWishes] = useState([]);
   const [wishInput, setWishInput] = useState('');
-  const emojis = ['😀', '🥰', '🎉', '💖', '💍', '😇', '😍', '🙌', '🎊', '✨'];
   const [currentPage, setCurrentPage] = useState(1);
   const wishesPerPage = 5; // Jumlah per halaman
   const indexOfLastWish = currentPage * wishesPerPage;
-    const indexOfFirstWish = indexOfLastWish - wishesPerPage;
-    const currentWishes = wishes.slice(indexOfFirstWish, indexOfLastWish);
-    const totalPages = Math.ceil(wishes.length / wishesPerPage);
-    
+  const indexOfFirstWish = indexOfLastWish - wishesPerPage;
+  const [showModal, setShowModal] = useState(false);
+  // const [showRSVP,  setShowRSVP]  = useState(false); 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [bgIndex, setBgIndex] = useState(0);
 
 
+  const profiles = [
+  { id: 'primary',   name: 'Dito & Dini',      avatar: '/Netflix-avatar.png' },];
+  const [phase, setPhase] = useState('intro'); // intro | profile | main
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
-  // Intro Timeout
-  useEffect(() => {
+  // Gambar-gambar background
+const backgroundImages = [
+  { url: "/dito2.jpg", object: "object-[50%_10%]" },
+  { url: "/prewed2.jpg", object: "object-[60%_20%]" },
+  { url: "/prewed3.jpg", object: "object-center" },
+  { url: "/prewed4.jpg", object: "object-center" },
+];
+
+// Slideshow effect
+useEffect(() => {
+  let interval;
+  if (isPlaying) {
+    interval = setInterval(() => {
+      setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+    }, 3000); // ganti gambar setiap 3 detik
+  } else {
+    clearInterval(interval);
+  }
+  return () => clearInterval(interval);
+}, [isPlaying]);
+
+
+useEffect(() => {
+  if (showIntro) {
     const timer = setTimeout(() => {
       setShowIntro(false);
-      setIntroFinished(true);
+      setPhase('profile');  // langsung ke profile scene!
     }, 3500);
     return () => clearTimeout(timer);
-  }, []);
-
-
-  // Play audio on intro
-  useEffect(() => {
-  if (showIntro && audioRef.current) {
-    audioRef.current.muted = true;
-    audioRef.current.play().catch(() => {});
   }
 }, [showIntro]);
 
-  // Countdown
-  useEffect(() => {
-    const targetDate = new Date('2025-09-21T11:00:00+07:00');
-    const interval = setInterval(() => {
-      const now = new Date();
-      const diff = targetDate - now;
-      if (diff <= 0) {
-        setCountdown('Acara telah dimulai!');
-        clearInterval(interval);
-        return;
-      }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / 1000 / 60) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      setCountdown(`${days} hari ${hours} jam ${minutes} menit ${seconds} detik`);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+
+  // Play audio on intro
+ useEffect(() => {
+  if (showIntro && audioRef.current) {
+    audioRef.current.muted = isMuted;
+    audioRef.current.play().catch((e) =>
+      console.log("Autoplay blocked:", e)
+    );
+  }
+}, [showIntro]);
+
 
   // Scroll detection to hide poster
   useEffect(() => {
@@ -97,27 +104,45 @@ export default function WeddingInvitation() {
     }, [isDark]);
 
 
-// fetching ke supabase 
-// Ambil semua wish saat pertama load
-useEffect(() => {
-  const fetchWishes = async () => {
-    const { data, error } = await supabase.from('wishes').select('*').order('created_at', { ascending: false });
-    if (error) {
-      console.error('Gagal fetch wishes:', error.message);
-    } else {
-      setWishes(data);
-    }
+
+    
+// Saat Kirim Ucapan
+const handleSubmitWish = async () => {
+  const newWish = {
+    name: guestName.trim(),
+    message: wishInput.trim(),
   };
 
-  if (isGuestConfirmed) {
-    fetchWishes();
+  const { data, error } = await supabase
+    .from('wishes')
+    .insert([newWish])
+    .select();
+
+  if (error) {
+    console.error('❌ Gagal menyimpan ke Supabase:', error.message);
+  } else {
+    setWishes((prev) => [data[0], ...prev]);
+    setWishInput('');
+    setGuestName('');
   }
-}, [isGuestConfirmed]);
+};
 
-// untuk auto reload wishes realtime
+// Fetch wishes awal
 useEffect(() => {
-  if (!isGuestConfirmed) return;
+  const fetchWishes = async () => {
+    const { data, error } = await supabase
+      .from('wishes')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (!error) setWishes(data);
+  };
 
+  fetchWishes();
+}, []);
+
+
+// Realtime update (opsional)
+useEffect(() => {
   const channel = supabase
     .channel('realtime-wishes')
     .on('postgres_changes', {
@@ -129,136 +154,411 @@ useEffect(() => {
     })
     .subscribe();
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [isGuestConfirmed]);
+  return () => supabase.removeChannel(channel);
+}, []);
+
+// Ambil semua wish saat pertama load
+// useEffect(() => {
+//   const fetchWishes = async () => {
+//     const { data, error } = await supabase.from('wishes').select('*').order('created_at', { ascending: false });
+//     if (error) {
+//       console.error('Gagal fetch wishes:', error.message);
+//     } else {
+//       setWishes(data);
+//     }
+//   };
+
+//   if (isGuestConfirmed) {
+//     fetchWishes();
+//   }
+// }, [isGuestConfirmed]);
+
+// untuk auto reload wishes realtime
+// useEffect(() => {
+//   if (!isGuestConfirmed) return;
+
+//   const channel = supabase
+//     .channel('realtime-wishes')
+//     .on('postgres_changes', {
+//       event: 'INSERT',
+//       schema: 'public',
+//       table: 'wishes',
+//     }, (payload) => {
+//       setWishes((prev) => [payload.new, ...prev]);
+//     })
+//     .subscribe();
+
+//   return () => {
+//     supabase.removeChannel(channel);
+//   };
+// }, [isGuestConfirmed]);
 
 // Saat Kirim Doa
-const handleSubmitWish = async () => {
-  if (!wishInput.trim()) return;
+// const handleSubmitWish = async () => {
+//   if (!wishInput.trim()) return;
 
-  const newWish = {
-    name: guestName || 'Tamu',
-    message: wishInput.trim(),
-    emoji: emojis[Math.floor(Math.random() * emojis.length)],
-  };
+//   const newWish = {
+//     name: guestName || 'Tamu',
+//     message: wishInput.trim(),
+//     emoji: emojis[Math.floor(Math.random() * emojis.length)],
+//   };
 
-  const { data, error } = await supabase
-    .from('wishes')
-    .insert([newWish])
-    .select();
+//   const { data, error } = await supabase
+//     .from('wishes')
+//     .insert([newWish])
+//     .select();
 
-  if (error) {
-    console.error('❌ Gagal menyimpan ke Supabase:', error.message);
-  } else {
-    setWishes((prev) => [data[0], ...prev]); // ⬅️ langsung tambahkan ke UI
-    setWishInput('');
-  }
-};
+//   if (error) {
+//     console.error('❌ Gagal menyimpan ke Supabase:', error.message);
+//   } else {
+//     setWishes((prev) => [data[0], ...prev]); // ⬅️ langsung tambahkan ke UI
+//     setWishInput('');
+//   }
+// };
 
-
-
-
-
-
-const introContainerRef = useRef(null); // ⬅️ Tambahkan ini di atas
-
-const handleGuestConfirm = () => {
-  if (!guestName) return;
-
-   // ✨ 1. Buat efek fade-out dulu
-  if (introContainerRef.current) {
-    introContainerRef.current.classList.add("animate-fadeOut");
-  }
-
-  // ✨ 2. Setelah 1 detik (durasi animasi), scroll ke hero & update state
-  setTimeout(() => {
-    setIsGuestConfirmed(true);
-    const heroEl = document.getElementById("hero");
-    if (heroEl) {
-      heroEl.scrollIntoView({ behavior: "smooth" });
-    }
-  }, 1000);
-};
-
-// slider
-const [sliderRef, instanceRef] = useKeenSlider({
-    loop: true,
-    renderMode: "performance",
-    mode: "free-snap",
-    slides: {
-      perView: 3,
-      spacing: 15,
-    },
-    created(s) {
-      setInterval(() => {
-        if (s) s.next();
-      }, 3000); // auto-scroll every 3s
-    },
-  });
-
-  
 
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans overflow-hidden relative scroll-smooth">
-        <button
-            onClick={() => setIsDark(!isDark)}
-            className="fixed top-4 left-4 z-50 bg-white dark:bg-black text-black dark:text-white px-4 py-2 rounded-full shadow transition"
-            >
-            {isDark ? "☀️ Light" : "🌙 Dark"}
-            </button>
-      <audio
-        ref={audioRef}
-        src="/backsound.mp3"
-        autoPlay
-        loop
-        muted={isMuted}
-      />
-
-      {/* Intro */}
       <AnimatePresence>
-        {introFinished && !isGuestConfirmed && (
-        <section 
-        ref={introContainerRef}
-        className="fixed inset-0 bg-white dark:bg-black dark:text-black text-black flex flex-col items-center justify-center z-40">
-    <h1 className="text-4xl font-bold mb-4 text-red-600 font-bebas">N I K A H Y U K </h1>
-    <p className="text-lg mb-6 dark:text-white">Who's Invited?</p>
+      {phase === 'profile' && (
+        <motion.section
+          className="fixed inset-0 bg-black flex flex-col items-center justify-center z-40 px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-semibold text-white mb-12 text-center">Who's Invited ?</h1>
+          <div className="w-full flex justify-center">
+            <div className={`mb-8 ${
+              profiles.length === 1
+                ? "flex justify-center"
+                : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8"
+            }`}>
+              {profiles.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => {
+                    setSelectedProfile(p);
+                    setPhase('main'); // <-- Langsung ke halaman main!
+                  }}
+                  className={`
+                    flex flex-col items-center space-y-2
+                    focus:outline-none transition-transform hover:scale-105
+                  `}
+                >
+                  <img
+                    src={p.avatar}
+                    alt={p.name}
+                    className="w-24 h-24 rounded-md object-cover"
+                  />
+                  <span className="text-sm text-gray-200">{p.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+           {/* Add "You" text with white border */}
+          <div className="mt-2 border-2 border-white rounded-xl px-6 py-2 text-white font-semibold h">
+            You
+          </div>
+        </motion.section>
+      )}
 
-    {/* Avatar + Input */}
-    <div className="flex flex-col items-center mb-4">
-      <img
-        src="/dito2.jpg"
-        alt="Netflix Avatar"
-        className="w-24 h-24 rounded-md"
-      />
-      <input
-        type="text"
-        value={guestName}
-        onChange={(e) => setGuestName(e.target.value)}
-        placeholder="Type your name..."
-        className="mt-4 px-4 py-2 rounded-md bg-gray-500 dark:bg-white text-black w-64"
-      />
+
+{phase === 'main' && (
+  <section className="relative w-full min-h-[100vh] flex items-end md:items-center overflow-hidden bg-black">
+    {/* RSVP Button */}
+    <div className="absolute top-4 left-4 z-50">
+      <a
+    href="https://forms.gle/YOUR_FORM_LINK"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white text-black px-4 py-2 rounded font-semibold shadow inline-block"
+  >
+    📅 RSVP
+  </a>
     </div>
+  {/* Background image */}
+  <img
+    src={backgroundImages[bgIndex].url}
+    alt="The Story of Dito & Dini"
+    className={`absolute inset-0 w-full h-full object-cover ${backgroundImages[bgIndex].object} scale-105 transition-all duration-700 ease-in-out`}
+    style={{ zIndex: 0 }}
+  />
+  {/* Netflix black gradient overlay */}
+  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-transparent" style={{ zIndex: 1 }} />
+  
+  {/* Kiri: Konten */}
+  <div className="relative z-20 max-w-xl md:max-w-2xl px-8 py-14 md:py-0 text-white flex flex-col gap-3 md:gap-6 mt-44 ">
+    <h1 className="text-3xl md:text-5xl font-black leading-tight drop-shadow-lg">The Story of<br />Dito & Dini</h1>
+    <div className="flex items-center gap-2">
+      <span className="text-red-500 text-lg md:text-xl">★★★★★</span>
+      <span className="text-sm md:text-base">5.0</span>
+    </div>
+    <p className="text-base md:text-lg font-light drop-shadow-lg">
+      Setelah melewati banyak cerita, suka duka, dan tawa bersama, akhirnya Dito dan Dini melangkah ke babak baru kehidupan. Mari rayakan momen ini bersama!
+    </p>
+   <div className="flex gap-4 mt-3">
+      {/* Tombol PLAY */}
+  <button
+    onClick={() => setIsPlaying(!isPlaying)}
+    className="bg-red-600 hover:bg-red-700 px-6 py-2 rounded text-white font-semibold shadow border border-white"
+  >
+    {isPlaying ? "⏸ Pause" : "▶️ Play"}
+  </button>
+  <button
+    onClick={() => setShowModal(true)}
+    className="bg-gray-400/60 hover:bg-gray-700 px-7 py-2 rounded text-lg font-semibold border border-gray-300 shadow"
+  >
+    More Info
+  </button>
+</div>
 
-    <button
-      onClick={handleGuestConfirm}
-      disabled={!guestName}
-      className={`mt-2 px-6 py-2 rounded-full text-white font-semibold ${
-        guestName ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 cursor-not-allowed'
-      }`}
+
+
+
+
+{/* pop up untuk munculin episode */}
+<AnimatePresence>
+  {showModal && (
+    <motion.div
+      key="modal"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
     >
-      Next
-    </button>
-  </section>
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 50, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white dark:bg-gray-900 text-black dark:text-white w-full max-w-2xl rounded-xl overflow-y-auto max-h-[90vh] shadow-xl relative scrollbar-hide"
+      >
+        {/* Close button */}
+        <button
+          onClick={() => setShowModal(false)}
+          className="absolute top-3 right-4 text-gray-500 hover:text-red-500 text-2xl z-10"
+        >
+          ×
+        </button>
+
+        {/* Header */}
+        <div className="p-6 border-b border-gray-300 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-center"> Daftar Episode</h2>
+        </div>
+
+        {/* Episode List - Netflix Style */}
+        <div className="p-6 space-y-6">
+  {[
+     {
+      title: "Andhito Diaz Revanza & Andi Ummu Aulia Aiundini Tenrigangka",
+      image: "/ditodini.jpeg",
+      desc: "Langkah pertama menuju hidup bersama. Terima kasih telah menjadi bagian dari kisah kami. Evansyah & Ibu Dhyanchandra Patria Novimarmadewi",
+      badge: "Eps 1",
+      time: "Lamaran",
+    },
+    {
+      title: "Andhito Diaz Revanza",
+      time: "Putra dari",
+      image: "/dito1.jpg",
+      desc: "Bapak Evansyah & Ibu Dhyanchandra Patria Novimarmadewi",
+      badge: "Eps 2",
+    },
+    {
+      title: "Andi Ummu Aulia Aiundini Tenrigangka",
+      time: "Putri dari",
+      image: "/dini1.jpg",
+      desc: "Bapak Aferi Syamsidar Fudail & Ibu Onny Tenriyana",
+      badge: "Eps 3",
+
+    },
+    {
+      title: "Location",
+      time: "06 Juli 2025",
+      desc: "14:00 - 16:00",
+      badge: "Eps 4",
+      mapUrl:
+        "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.2643955185345!2d106.7594484!3d-6.4881659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c3837c7a5057%3A0x5f75423673ba0355!2sRumah%20Pak%20Feri!5e0!3m2!1sid!2sid!4v1749895143437!5m2!1sid!2sid",
+    },
+  ].map((ep, i) => (
+    <div key={i} className="relative flex gap-4 items-start bg-[#141c2f] p-4 rounded-xl">
+      <div className="w-32 h-32 rounded-lg overflow-hidden">
+        {ep.mapUrl ? (
+          <iframe
+            src={ep.mapUrl}
+            title="Lokasi"
+            className="w-full h-full border-0"
+            loading="lazy"
+            allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        ) : (
+          <img
+            src={ep.image}
+            alt={ep.title}
+            className="w-full h-full object-cover"
+          />
+        )}
+      </div>
+
+      <div className="flex-1">
+        <h3 className="font-bold">{ep.title}</h3>
+        <p className="text-sm text-yellow-600 dark:text-yellow-300 border border-yellow-500 dark:border-yellow-300 px-3 py-1 rounded-full inline-block font-semibold shadow-sm bg-yellow-100/20 dark:bg-yellow-900/20 mt-2 mb-2">
+          {ep.time}
+        </p>
+        {ep.place && (
+          <p className="text-sm text-gray-600 dark:text-gray-300">{ep.place}</p>
+        )}
+        <p className="text-sm text-gray-500 italic mt-1">{ep.desc}</p>
+        <span className="text-xs text-gray-400 whitespace-nowrap">{ep.duration}</span>
+
+        {/* Optional External Link for Google Maps */}
+        {ep.mapUrl && (
+          <a
+            href={`https://maps.app.goo.gl/fdnCTiYCmNkuCdDe7`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 dark:text-blue-400 underline mt-1 inline-block"
+          >
+            📍 Buka di Google Maps
+          </a>
+        )}
+        {ep.badge && (
+        <div className="absolute top-0 right-0 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg shadow-md z-10">
+          {ep.badge}
+        </div>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+  </div>
+</section>
 )}
+
+
+
+
+
+ {/* Top 10 Section */}
+<h3 className="text-xl text-white ml-10 mt-5 -mb-5 font-bold">Top 10 Momen Favorit Kami</h3>
+<div className="bg-black py-8">
+  <div className="flex gap-6 overflow-x-auto px-8 scrollbar-hide">
+    {[
+      { img: "/AdaApaDengan Cinta.png", title: "Ada Apa Dengan Cinta", desc: "Momen penuh nostalgia dan cinta." },
+      { img: "/CrashLandingOnYou.png", title: "Crash Landing", desc: "Pertemuan tak terduga yang manis." },
+      { img: "/DDThe Explorer.png", title: "DD The Explorer", desc: "Petualangan seru dan penuh tawa." },
+      { img: "/DuaLatarBiru.png", title: "Dua Latar Biru", desc: "Romansa yang tenang dan dalam." },
+      { img: "/KeluargaCemara.png", title: "Keluarga Cemara", desc: "Hangatnya kebersamaan keluarga." },
+      { img: "/LaLaLand.png", title: "La La Land", desc: "Drama musikal yang menginspirasi." },
+      { img: "/NantiKitaCeritaTentangHariIni.png", title: "NKCTHI", desc: "Cerita tentang keluarga dan luka lama." },
+      { img: "/PernikahanDini.png", title: "Pernikahan Dini", desc: "Awal kisah cinta mereka." },
+      { img: "/ReadyOrNot.png", title: "Ready or Not", desc: "Cinta dan kekacauan menyatu." },
+      { img: "/WhenLifeGivesYouTangerines.png", title: "When Life Gives You Tangerines", desc: "Cinta dan Restu Orang Tua." },
+    ].map((item, idx) => (
+      <div
+        key={idx}
+        className="relative w-44 h-64 flex-shrink-0 group overflow-hidden rounded-xl border-2 border-black shadow-lg hover:shadow-red-500 transition-all duration-300"
+      >
+        {/* Background image */}
+        <img
+          src={item.img}
+          alt={item.title}
+          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+        />
+
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+
+        {/* Detail Text */}
+       <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 z-20 opacity-0 group-hover:opacity-100 transform translate-y-8 group-hover:translate-y-0 transition-all duration-300 ease-in-out">
+          <h4 className="text-white text-sm font-bold">{item.title}</h4>
+          <p className="text-gray-300 text-xs mt-1">{item.desc}</p>
+        </div>
+
+        {/* Badge Premium */}
+        <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full shadow">
+          PREMIUM
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+
+{/* Form Ucapan & Daftar Wishes */}
+<section className="bg-black px-6 py-10 text-white text-center">
+  <h3 className="text-2xl font-bold mb-6">Tulis Ucapan & Doa</h3>
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      if (!guestName || !wishInput.trim()) return;
+      handleSubmitWish(); // Fungsi kirim ke Supabase
+    }}
+    className="flex flex-col gap-4 max-w-xl mx-auto"
+  >
+    <input
+      type="text"
+      placeholder="Nama kamu"
+      className="px-4 py-3 rounded bg-gray-800 border border-gray-700 text-white placeholder-gray-400"
+      value={guestName}
+      onChange={(e) => setGuestName(e.target.value)}
+      required
+    />
+    <textarea
+      placeholder="Ucapan atau doa kamu..."
+      className="px-4 py-3 rounded bg-gray-800 border border-gray-700 text-white placeholder-gray-400"
+      rows={4}
+      value={wishInput}
+      onChange={(e) => setWishInput(e.target.value)}
+      required
+    />
+    <button
+      type="submit"
+      className="bg-red-600 hover:bg-red-700 px-5 py-3 rounded text-white font-semibold shadow"
+    >
+      Kirim Ucapan
+    </button>
+  </form>
+
+  {/* Recent Wishes */}
+  <div className="mt-10 max-w-2xl mx-auto">
+    <h4 className="text-xl font-semibold mb-4">Ucapan Terbaru 💌</h4>
+    <ul className="space-y-4">
+      {wishes.map((wish, i) => (
+        <li
+          key={i}
+          className="bg-gray-800 px-4 py-3 rounded-lg border border-gray-700"
+        >
+          <p className="text-sm text-gray-300">Dari: <span className="font-semibold text-white">{wish.name}</span></p>
+          <p className="mt-1 text-base text-white italic">“{wish.message}”</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
         {showIntro && (
           <motion.div
             key="intro"
             className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50 overflow-hidden"
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 5 }}
             transition={{ duration: 1 }}
           >
             {[...Array(40)].map((_, i) => (
@@ -279,9 +579,14 @@ const [sliderRef, instanceRef] = useKeenSlider({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1.5 }}
             >
-              N I K A H Y U K
+              NIKFLIX
             </motion.h1>
-            {introFinished && (
+            <audio
+              ref={audioRef}
+              src="/netflix_sound.mp3"
+              preload="auto"
+            />
+              {introFinished && (
               <motion.button
                 onClick={scrollToHero}
                 initial={{ opacity: 0 }}
@@ -302,542 +607,9 @@ const [sliderRef, instanceRef] = useKeenSlider({
         )}
       </AnimatePresence>
 
-      {/* Poster ala Netflix */}
-      <AnimatePresence>
-        {showPoster && introFinished && (
-          <motion.section
-            key="poster"
-            id="opening-poster"
-            className="relative h-screen bg-black text-white overflow-hidden"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <img
-              src="/dito2.jpg"
-              alt="Poster Dito & Dini"
-              className="absolute inset-0 w-full h-full object-cover object-top"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
-            <div className="relative z-10 flex flex-col justify-end items-start h-full p-6 md:p-16 text-left">
-              <motion.span
-                className="text-5xl font-bold text-red-600 z-10 font"
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 1.5 }}
-              >
-                NIKAHFIX
-              </motion.span>
-              <h1 className="text-4xl md:text-5xl font-bold mt-2">
-                Dito & Dini:<br />Sebelum Hari H
-              </h1>
-              <p className="text-sm text-white mt-4 font-bold">
-                <span className="bg-red-600 px-3 py-1 rounded text-sm text-white">Coming soon</span> • 26 Oktober 2024
-              </p>
-              <button
-                onClick={scrollToHero}
-                className="mt-10 bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-full text-lg shadow-lg"
-              >
-                Lihat Selengkapnya <FaChevronDown className="inline ml-2" />
-              </button>
-            </div>
-          </motion.section>
-        )}
-      </AnimatePresence>
-
-    {isGuestConfirmed && (
-        <>
-        {/* ✅ Tambahkan teks sambutan di pojok kanan atas */}
-        <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="fixed top-4 right-4 z-40 bg-white dark:bg-black text-black dark:text-white text-xs px-4 py-2 rounded-full shadow">
-        Selamat datang, {guestName}! 
-        </motion.div>
-          
-        {/* Hero */}
-        <section id="hero" className="bg-white dark:bg-black text-white pt-20 pb-10 px-6 dark:text-white">
-            {/* Video Trailer */}
-            <div className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-xl">
-                <video
-                className="w-full h-auto object-cover"
-                src="/video-prewed.mp4"
-                poster="/thumbnail-prewed.jpg"
-                controls
-                />
-             </div>
 
 
 
-        {/* Detail Info ala Netflix */}
-        <div className="max-w-4xl mx-auto mt-10 bg-white dark:bg-black dark:text-white text-black">
-                <p className="text-red-500 font-semibold text-sm mb-1">N <span className="text-gray-400">DOCUMENTARY</span></p>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">Dhito & Dini: Sebelum Hari H</h1>
-
-                <div className="flex flex-wrap gap-4 items-center text-sm text-gray-400 mb-4">
-                <span className="text-green-400 font-semibold">100% match</span>
-                <span className="border border-gray-400 px-1">SU</span>
-                <span>2024</span>
-                <span>1h 26m</span>
-                <span className="border border-gray-400 px-1">4K</span>
-                <span className="border border-gray-400 px-1">HDR</span>
-                </div>
-
-                <p className="bg-red-600 inline-block text-white px-4 py-1 rounded mb-4 font-semibold">
-                Coming soon on Saturday, 26 October 2024
-                </p>
-
-                <p className="text-black dark:text-white leading-relaxed mb-6">
-                Setelah Yohan dan Alya dipertemukan dalam situasi yang tepat, di mana keduanya telah siap untuk
-                memulai hubungan bersama, tibalah mereka di awal perjalanan baru menuju pernikahan.
-                </p>
-
-                <p className="text-sm italic text-gray-500 text-center border-t pt-4">
-                "Segala sesuatu Kami ciptakan berpasang-pasangan agar kamu mengingat (kebesaran Allah)"<br />
-                <span className="text-xs">– Q.S. Az-Zariyah: 49</span>
-                </p>
-        </div>
-        </section>
-        {/* poster prewed */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-6 py-16">
-      {/* <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">🎬 Koleksi Poster Prewed</h2> */}
-      <div ref={sliderRef} className="keen-slider">
-        {[
-          "/AdaApaDenganCinta.jpg",
-          "/PernikahanDini.jpg",
-          "/ReadyorNot.jpg",
-          "/renang-renangketepian.jpg",
-          "/senyumadalahibadah.jpg",
-        ].map((src, idx) => (
-          <div
-            key={idx}
-            className="keen-slider__slide rounded-xl overflow-hidden transform transition-transform duration-300 hover:scale-105"
-          >
-            <img src={src} alt={`Poster ${idx + 1}`} className="w-full h-full object-cover aspect-[2/3]" />
-          </div>
-        ))}
-      </div>
-        </section>
-
-        {/* Breaking News Section */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-6 py-16">
-            <div className="max-w-3xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">🗞️ Breaking News</h2>
-
-        {/* Gambar & Caption */}
-        <div className="relative overflow-hidden rounded-xl mb-6">
-                <motion.img
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    src="/dito2.jpg"
-                    alt="Breaking Announcement"
-                    className="w-full h-auto object-cover"
-                />
-        </div>
-
-        {/* Isi Pesan */}
-        <div className="space-y-5 text-black dark:text-white leading-relaxed text-sm sm:text-base">
-                <p>
-                    Halo! Kami ingin informasikan bahwa kami akan segera menikah, dan kamu jadi 1 dari 100 orang
-                    yang kami undang untuk hadir di hari bahagia kami!
-                </p>
-                <p>
-                    Perlu diketahui, karena bersifat <span className="italic">intimate wedding</span> dan hanya
-                    mengundang orang terdekat, maka dari itu kami harapkan untuk tidak menyebarluaskan
-                    informasi detail terkait hari pernikahan kami (misalnya, lokasi dan waktu acara).
-                </p>
-                <p>
-                    Kami tunggu kedatangannya di hari bahagia kami ya!
-                </p>
-                <p className="mt-6 text-white font-semibold">Dengan penuh cinta,</p>
-        </div>
-        </div>
-        </section>
-
-        {/* Bride and Groom Section */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-6 py-20 ">
-            <div className="max-w-5xl mx-auto">
-                <h2 className="text-center text-2xl md:text-3xl font-semibold mb-12">
-                <span role="img" aria-label="love">💐</span> Bride and Groom
-                </h2>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 text-center">
-
-                {/* Bride */}
-                <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                >
-                    <div className="overflow-hidden rounded-2xl group">
-                    <img
-                        src="/dini1.jpg"
-                        alt="Andi Ummu Aulia Aiundini Tenrigangka"
-                        className="w-full h-full aspect-[3/4] object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    </div>
-                    <h3 className="text-lg font-semibold text-yellow-400 mt-4">
-                    Andi Ummu Aulia Aiundini Tenrigangka
-                    </h3>
-                    <p className="text-sm text-black dark:text-white mt-1">
-                    Putri dari <span className='text-yellow-400'>Bapak Akri Syamsidar Fudail & Ibu Onny Tenriyana</span>
-                    </p>
-                </motion.div>
-
-                {/* Groom */}
-                <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                >
-                    <div className="overflow-hidden rounded-2xl group">
-                    <img
-                        src="/dito1.jpg"
-                        alt="Andhito Diaz Revandra"
-                        className="w-full h-full aspect-[3/4] object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    </div>
-                    <h3 className="text-lg font-semibold text-yellow-400 mt-4">
-                    Andhito Diaz Revandra
-                    </h3>
-                    <p className="text-sm text-black dark:text-white mt-1">
-                    Putra dari <span className='text-yellow-400'>Bapak Karansyah & Ibu Dhiyanchandra Patria Novianamadawi</span>
-                    </p>
-                </motion.div>
-                </div>
-            </div>
-        </section>
-
-        {/* Location Section */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-4 md:px-6 py-20">
-        <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">📍 Location</h2>
-
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
-            {/* Google Maps */}
-            <div className="w-full max-w-md h-52 sm:h-56 md:h-60 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                <iframe
-                title="Lokasi Warna-Warni Resto"
-                className="w-full h-full border-0"
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.2643955185345!2d106.7594484!3d-6.488165899999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c3837c7a5057%3A0x5f75423673ba0355!2sRumah%20Pak%20Feri!5e0!3m2!1sen!2sid!4v1749287229226!5m2!1sen!2sid"
-                ></iframe>
-            </div>
-
-            {/* Alamat */}
-            <div className="text-center lg:text-left max-w-md">
-                <h3 className="text-xl font-bold mb-2">Rumah Pak Feri</h3>
-                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                Jl. Tonjong, Tajur Halang,<br />
-                Bogor Regency,<br />
-                West Java 16320, Indonesia
-                </p>
-                <a
-                href="https://maps.app.goo.gl/fdnCTiYCmNkuCdDe7"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-4 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full transition"
-                >
-                Buka di Google Maps
-                </a>
-            </div>
-            </div>
-        </div>
-        </section>
-
-        {/* Prewed Movie Poster Section */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-4 py-20">
-        <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">🎬 Prewed Movie Posters</h2>
-            <p className="text-center text-gray-700 dark:text-gray-300 mb-10 text-sm md:text-base">
-            Foto-foto prewedding kami dengan sentuhan poster film favorit 🎥✨
-            </p>
-
-            {/* Responsive Grid */}
-            <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-center">
-            {[
-                {   img: "/AdaApaDenganCinta.png", label: "Groom's Favorite" },
-                { img: "/CrashLandingOnYou.png", label: "Romantice" },
-                { img: "/DDTheExplorer.png", label: "TOP 10" },
-                { img: "/KeluargaCemara.png", label: "TOP 1" },
-                { img: "/ReadyOrNot.png", label: "Our Favorite " },
-                { img: "/Renang-RenangKetepian.png", label: " Family" },
-                { img: "/TheProposal.jpg", label: "Wedding" },
-                { img: "/PernikahanDini.png", label: "TOP 5" },
-                { img: "/LaLaLand.png", label: "Bride's Favorite" },
-                { img: "/NantiKitaCeritaHariIni.png", label: "Bride's Favorite" },
-            ].map((item, idx) => (
-                <div
-                key={idx}
-                className="relative rounded-xl overflow-hidden shadow-md hover:scale-[1.03] transition-transform duration-300"
-                >
-                <img
-                    src={item.img}
-                    alt={item.label || `Poster ${idx + 1}`}
-                    className="w-full h-auto object-cover aspect-[2/3]"
-                />
-                {item.label && (
-                    <span className="absolute bottom-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow">
-                    {item.label}
-                    </span>
-                )}
-                </div>
-            ))}
-            </motion.div>
-        </div>
-        </section>
-
-        {/* Episode Timeline */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-6 py-20">
-  <h2 className="text-3xl font-bold text-center mb-10">📺 Episode Timeline</h2>
-  <div className="grid gap-6 md:grid-cols-3">
-    {[
-      {
-        title: "🎬 Episode 1: Akad",
-        date: "Minggu, 21 September 2025",
-        time: "Pukul 10:00 WIB",
-        place: "Plataran Dharmawangsa, Jakarta",
-        image: "/akad.png", // ganti ke image kamu
-      },
-      {
-        title: "🎉 Episode 2: Resepsi",
-        date: "Minggu, 21 September 2025",
-        time: "Pukul 11:30 WIB",
-        place: "Plataran Dharmawangsa, Jakarta",
-        image: "/resepsi.png", // ganti ke image kamu
-      },
-      {
-        title: "📺 Episode 3: Live Streaming",
-        date: "Tonton dari mana saja",
-        time: "YouTube & Zoom Link (segera)",
-        place: "",
-        image: "/livestreaming.png", // ganti ke image kamu
-      },
-    ].map((ep, i) => (
-      <div
-        key={i}
-        className="relative rounded-xl overflow-hidden group h-64 shadow-lg"
-      >
-        <img
-          src={ep.image}
-          alt={ep.title}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-60 p-6 flex flex-col justify-end transition duration-300">
-          <h3 className="text-lg font-bold mb-1">{ep.title}</h3>
-          <p className="text-sm text-gray-300">{ep.date}</p>
-          <p className="text-sm text-gray-400">{ep.time}</p>
-          {ep.place && <p className="text-sm text-gray-400">{ep.place}</p>}
-        </div>
-      </div>
-    ))}
-  </div>
-        </section>
-
-         {/* Confirmation Section */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-6 py-20">
-        <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-6">📝 Konfirmasi Kehadiran</h2>
-            <p className="mb-4 text-gray-700 dark:text-gray-300">
-            Kami sangat berharap kehadiranmu di hari bahagia kami. Silakan isi form konfirmasi kehadiran berikut:
-            </p>
-            <a
-            href="https://dito-project-iota.vercel.app/guest-form" // GANTI DENGAN LINK FORM KAMU
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-4 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full text-lg shadow-lg transition"
-            >
-            Isi Form Kehadiran Dan Buat Ticket QR 
-            </a>
-        </div>
-        </section>
-
-        {/* Save the Date Section */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-6 py-20">
-  <div className="max-w-3xl mx-auto text-center">
-    <h2 className="text-2xl md:text-3xl font-bold mb-6">📅 Save the Date</h2>
-    <p className="mb-4 text-gray-700 dark:text-gray-300">
-      Jangan lupa simpan tanggal pernikahan kami di kalender kamu, ya!
-    </p>
-    <a
-      href="https://www.google.com/calendar/render?action=TEMPLATE&text=Akad+Pernikahan+Dito+%26+Dini&dates=20250921T030000Z/20250921T050000Z&details=Acara+Akad+Pernikahan+Andhito+dan+Dini+di+Plataran+Dharmawangsa&location=Plataran+Dharmawangsa,+Jakarta&sf=true&output=xml"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-block mt-4 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full text-lg transition"
-    >
-      Tambahkan ke Google Calendar
-    </a>
-  </div>
-        </section>
-
-        {/* Wish for the Couple */}
-        <section className="bg-white dark:bg-black text-black dark:text-white px-4 py-20">
-            <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">💌 Wish for the Couple</h2>
-              <div className="flex items-start gap-3 mb-8">
-                <div className="text-2xl">😀</div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold mb-1">{guestName || "Tamu"}</p>
-                  <textarea
-                    value={wishInput}
-                    onChange={(e) => setWishInput(e.target.value)}
-                    placeholder="Tulis doa terbaik kamu di sini..."
-                    className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm text-black dark:text-white"
-                    rows={3}
-                  />
-                  <button
-                    onClick={handleSubmitWish}
-                    disabled={!wishInput.trim()}
-                    className="mt-2 px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 disabled:bg-gray-400"
-                  >
-                    Kirim Doa
-                  </button>
-                </div>
-              </div>
-              <div className="space-y-4 text-sm">
-                {currentWishes.map((wish, idx) => (
-                  <motion.div 
-                  key={idx}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }} 
-                  className="flex items-start gap-3"
-                  >
-                    <div className="text-2xl">{wish.emoji}</div>
-                    <div>
-                      <p className="font-semibold">{wish.name}</p>
-                      <p className="text-gray-700 dark:text-gray-300">{wish.message}</p>
-                    </div>
-                  </motion.div>
-                ))}
-
-                
-                {/* pagination wishe */}
-                <div className="flex justify-center mt-6 gap-2">
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                    key={i + 1}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        currentPage === i + 1
-                        ? 'bg-red-600 text-white'
-                        : 'bg-gray-300 dark:bg-gray-700 text-black dark:text-white'
-                    }`}
-                    >
-                    {i + 1}
-                    </button>
-                ))}
-                </div>
-              </div>
-            </div>
-        </section>
-
-        {/* 🎞️ Credit Scene */}
-       <section className="bg-white dark:bg-black text-black dark:text-white py-20 overflow-hidden">
-  <div className="w-full flex justify-center">
-    <div className="w-full max-w-xl text-center">
-      <h2 className="text-3xl font-bold mb-6">🎬 Cast & Crew</h2>
-
-      <div className="relative h-72 md:h-96 overflow-hidden">
-        <div
-          className="absolute animate-credit-scroll text-base md:text-lg leading-loose space-y-2 w-full"
-          style={{ animationDuration: "40s" }}
-        >
-          <p>👰🏻‍♀️ Bride: <strong>Dini Amanda</strong></p>
-          <p>🤵🏻 Groom: <strong>Andhito Prakoso</strong></p>
-          <p>🎥 Videographer: <strong>@cinematic.id</strong></p>
-          <p>📸 Photographer: <strong>@dokumentasi.hariini</strong></p>
-          <p>🪄 Wedding Organizer: <strong>@wo_specialday</strong></p>
-          <p>👗 Makeup Artist: <strong>@muabrideglow</strong></p>
-          <p>🎶 Music: <strong>@soundoflove</strong></p>
-          <p>🌷 Dekorasi: <strong>@dekor.lavie</strong></p>
-          <p>🍽️ Catering: <strong>@tasteandjoy</strong></p>
-
-          <br />
-          <p className="text-yellow-400 font-bold text-xl">✨ Special Thanks To</p>
-          <p>👨‍👩‍👧 Keluarga Besar Dito & Dini</p>
-          <p>🫶 Sahabat Sejati</p>
-          <p>🎉 Seluruh Tamu Undangan</p>
-          <p>🙏 Yang sudah mendoakan</p>
-
-          <br />
-          <p className="text-sm italic text-gray-400">NIKAHFIX Productions – All Rights Reserved</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <style jsx>{`
-    @keyframes credit-scroll {
-      0% {
-        transform: translateY(100%);
-      }
-      100% {
-        transform: translateY(-100%);
-      }
-    }
-    .animate-credit-scroll {
-      animation-name: credit-scroll;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
-    }
-  `}</style>
-       </section>
-
-        {/* Jika tidak bisa hadir */}
-       {/* <section className="bg-white dark:bg-black text-black dark:text-white py-16 px-6">
-  <div className="max-w-xl mx-auto text-center">
-    <h2 className="text-3xl font-bold mb-4">🎁 Tidak Bisa Hadir</h2>
-    <p className="text-gray-600 dark:text-gray-300 mb-6">
-      Jika Tidak Bisa Hadir Anda Bisa Transfer Ke Rekening Kami Dan Membuat Pesan Konfirmasi 💝
-    </p>
-
-    <img
-      src="/qris.png" // Ganti dengan QRIS-mu
-      alt="QR Code"
-      className="w-60 mx-auto mb-4 border shadow-md rounded-lg"
-    />
-
-    <p className="text-sm mb-6 text-gray-500 dark:text-gray-400">
-      Atas nama: <strong>Andhito Prakoso</strong> <br />
-      Bank: BCA / eWallet lainnya
-    </p>
-
-    <div className="mb-4">
-      <textarea
-        placeholder="Tulis pesan/ucapanmu di sini..."
-        className="w-full p-3 rounded-md border dark:border-gray-600 dark:bg-gray-800"
-        rows={3}
-      />
-    </div>
-
-    <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full transition">
-      ✅ Saya sudah transfer
-    </button>
-  </div>
-</section> */}
-
-
-
-        
-
-
-
-        </>
-      )}
 
       {/* CSS */}
       <style jsx>{`
@@ -860,6 +632,21 @@ const [sliderRef, instanceRef] = useKeenSlider({
         .animate-roll {
         animation: roll 25s linear infinite;
          }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      .scrollbar-hide {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
+      
       `}</style>
     </div>
   );
