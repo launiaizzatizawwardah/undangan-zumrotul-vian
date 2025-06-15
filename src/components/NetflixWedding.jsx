@@ -21,6 +21,7 @@ export default function WeddingInvitation() {
   // const [showRSVP,  setShowRSVP]  = useState(false); 
   const [isPlaying, setIsPlaying] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
 
   const profiles = [
@@ -271,7 +272,7 @@ useEffect(() => {
     {/* RSVP Button */}
     <div className="absolute top-4 left-4 z-50">
       <a
-    href="https://forms.gle/YOUR_FORM_LINK"
+    href="https://forms.https://dito-project-git-master-parlisaastens-projects.vercel.app/guest-form/YOUR_FORM_LINK"
     target="_blank"
     rel="noopener noreferrer"
     className="bg-white text-black px-4 py-2 rounded font-semibold shadow inline-block"
