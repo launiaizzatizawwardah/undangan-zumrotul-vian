@@ -29,14 +29,6 @@ export default function WeddingInvitation() {
   const [phase, setPhase] = useState('intro'); // intro | profile | main
   const [selectedProfile, setSelectedProfile] = useState(null);
 
-  // Gambar-gambar background
-const backgroundImages = [
-  { url: "/dito2.jpg", object: "object-[50%_10%]" },
-  { url: "/prewed2.jpg", object: "object-[60%_20%]" },
-  { url: "/prewed3.jpg", object: "object-center" },
-  { url: "/prewed4.jpg", object: "object-center" },
-];
-
 // Slideshow effect
 useEffect(() => {
   let interval;
@@ -220,7 +212,7 @@ useEffect(() => {
 
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans overflow-hidden relative scroll-smooth">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans overflow-x-hidden relative scroll-smooth">
       <AnimatePresence>
       {phase === 'profile' && (
         <motion.section
@@ -268,187 +260,556 @@ useEffect(() => {
 
 
 {phase === 'main' && (
-  <section className="relative w-full min-h-[100vh] flex items-end md:items-center overflow-hidden bg-black">
-    {/* RSVP Button */}
-    <div className="absolute top-4 left-4 z-50">
-      <a
-    href="https://dito-project-iota.vercel.app/guest-form"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="bg-white text-black px-4 py-2 rounded font-semibold shadow inline-block"
-  >
-    📅 RSVP
-  </a>
-    </div>
-  {/* Background image */}
+// Di dalam WeddingInvitation.jsx setelah pilih profile
+ <section className="relative w-full h-screen scrollbar-hide overflow-hidden">
+  {/* Gambar sebagai latar belakang fullscreen */}
   <img
-    src={backgroundImages[bgIndex].url}
-    alt="The Story of Dito & Dini"
-    className={`absolute inset-0 w-full h-full object-cover ${backgroundImages[bgIndex].object} scale-105 transition-all duration-700 ease-in-out`}
-    style={{ zIndex: 0 }}
+    src="/dito2.jpg" // ← ganti dengan gambar kamu
+    alt="Poster Prewed"
+    className="absolute inset-0 w-full h-full object-cover object-top z-0"
   />
-  {/* Netflix black gradient overlay */}
-  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-transparent" style={{ zIndex: 1 }} />
-  
-  {/* Kiri: Konten */}
-  <div className="relative z-20 max-w-xl md:max-w-2xl px-8 py-14 md:py-0 text-white flex flex-col gap-3 md:gap-6 mt-44 ">
-    <h1 className="text-3xl md:text-5xl font-black leading-tight drop-shadow-lg">The Story of<br />Dito & Dini</h1>
-    <div className="flex items-center gap-2">
-      <span className="text-red-500 text-lg md:text-xl">★★★★★</span>
-      <span className="text-sm md:text-base">5.0</span>
-    </div>
-    <p className="text-base md:text-lg font-light drop-shadow-lg">
-      Setelah melewati banyak cerita, suka duka, dan tawa bersama, akhirnya Dito dan Dini melangkah ke babak baru kehidupan. Mari rayakan momen ini bersama!
-    </p>
-   <div className="flex gap-4 mt-3">
-      {/* Tombol PLAY */}
-  <button
-    onClick={() => setIsPlaying(!isPlaying)}
-    className="bg-red-600 hover:bg-red-700 px-6 py-2 rounded text-white font-semibold shadow border border-white"
-  >
-    {isPlaying ? "⏸ Pause" : "▶️ Play"}
-  </button>
-  <button
-    onClick={() => setShowModal(true)}
-    className="bg-gray-400/60 hover:bg-gray-700 px-7 py-2 rounded text-lg font-semibold border border-gray-300 shadow"
-  >
-    More Info
-  </button>
-</div>
 
+  {/* Overlay hitam transparan agar teks tetap terbaca */}
+  <div className="absolute inset-0 bg-black/55 md:bg-black/75  z-10"></div>
 
+  {/* Konten di atas gambar */}
+  <div className="relative z-20 flex flex-col items-start justify-end h-full px-6 md:px-20 pb-16 text-left text-white">
 
-
-
-{/* pop up untuk munculin episode */}
-<AnimatePresence>
-  {showModal && (
-    <motion.div
-      key="modal"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+ {/* NIKAHFIX - SVG curved */}
+ <div className="-mb-2 lg:-mb-2 md:ml-0 lg:-ml-8">
+  <svg viewBox="0 0 400 51" className="w-40 h-20 md:w-56 md:h-20 lg:w-64 lg:h-28">
+    <defs>
+      <path id="curve" d="M20,90 Q200,0 400,80" fill="transparent" />
+        {/* Filter untuk bayangan */}
+      <filter id="textShadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="black" flood-opacity="0.4"/>
+      </filter>
+    </defs>
+    <text
+      fontSize="140"
+      className="fill-red-600 font-black tracking-wide font-bebas"
     >
-      <motion.div
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 50, opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="bg-white dark:bg-gray-900 text-black dark:text-white w-full max-w-2xl rounded-xl overflow-y-auto max-h-[90vh] shadow-xl relative scrollbar-hide"
-      >
-        {/* Close button */}
-        <button
-          onClick={() => setShowModal(false)}
-          className="absolute top-3 right-4 text-gray-500 hover:text-red-500 text-2xl z-10"
-        >
-          ×
-        </button>
-
-        {/* Header */}
-        <div className="p-6 border-b border-gray-300 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-center"> Daftar Episode</h2>
-        </div>
-
-        {/* Episode List - Netflix Style */}
-        <div className="p-6 space-y-6">
-  {[
-     {
-      title: "Andhito Diaz Revanza & Andi Ummu Aulia Aiundini Tenrigangka",
-      image: "/ditodini.jpeg",
-      desc: "Langkah pertama menuju hidup bersama. Terima kasih telah menjadi bagian dari kisah kami. Evansyah & Ibu Dhyanchandra Patria Novimarmadewi",
-      badge: "Eps 1",
-      time: "Lamaran",
-    },
-    {
-      title: "Andhito Diaz Revanza",
-      time: "Putra dari",
-      image: "/dito1.jpg",
-      desc: "Bapak Evansyah & Ibu Dhyanchandra Patria Novimarmadewi",
-      badge: "Eps 2",
-    },
-    {
-      title: "Andi Ummu Aulia Aiundini Tenrigangka",
-      time: "Putri dari",
-      image: "/dini1.jpg",
-      desc: "Bapak Aferi Syamsidar Fudail & Ibu Onny Tenriyana",
-      badge: "Eps 3",
-
-    },
-    {
-      title: "Location",
-      time: "06 Juli 2025",
-      desc: "14:00 - 16:00",
-      badge: "Eps 4",
-      mapUrl:
-        "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.2643955185345!2d106.7594484!3d-6.4881659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c3837c7a5057%3A0x5f75423673ba0355!2sRumah%20Pak%20Feri!5e0!3m2!1sid!2sid!4v1749895143437!5m2!1sid!2sid",
-    },
-  ].map((ep, i) => (
-    <div key={i} className="relative flex gap-4 items-start bg-[#141c2f] p-4 rounded-xl">
-      <div className="w-32 h-32 rounded-lg overflow-hidden">
-        {ep.mapUrl ? (
-          <iframe
-            src={ep.mapUrl}
-            title="Lokasi"
-            className="w-full h-full border-0"
-            loading="lazy"
-            allowFullScreen
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        ) : (
-          <img
-            src={ep.image}
-            alt={ep.title}
-            className="w-full h-full object-cover"
-          />
-        )}
-      </div>
-
-      <div className="flex-1">
-        <h3 className="font-bold">{ep.title}</h3>
-        <p className="text-sm text-yellow-600 dark:text-yellow-300 border border-yellow-500 dark:border-yellow-300 px-3 py-1 rounded-full inline-block font-semibold shadow-sm bg-yellow-100/20 dark:bg-yellow-900/20 mt-2 mb-2">
-          {ep.time}
-        </p>
-        {ep.place && (
-          <p className="text-sm text-gray-600 dark:text-gray-300">{ep.place}</p>
-        )}
-        <p className="text-sm text-gray-500 italic mt-1">{ep.desc}</p>
-        <span className="text-xs text-gray-400 whitespace-nowrap">{ep.duration}</span>
-
-        {/* Optional External Link for Google Maps */}
-        {ep.mapUrl && (
-          <a
-            href={`https://maps.app.goo.gl/fdnCTiYCmNkuCdDe7`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-blue-600 dark:text-blue-400 underline mt-1 inline-block"
-          >
-            📍 Buka di Google Maps
-          </a>
-        )}
-        {ep.badge && (
-        <div className="absolute top-0 right-0 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg shadow-md z-10">
-          {ep.badge}
-        </div>
-        )}
-      </div>
-    </div>
-  ))}
+      <textPath href="#curve" startOffset="48%" textAnchor="middle">
+        NIKFLIX
+      </textPath>
+    </text>
+  </svg>
 </div>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+
+    <h1 className="text-3xl md:text-5xl font-extrabold leading-tigh lg:-ml-8">
+      Dito & Dini: <br /> Sebelum Hari H
+    </h1>
+
+    <div className="flex items-center gap-3 mt-3 lg:-ml-8">
+      <span className="bg-red-600 text-white text-xs md:text-sm px-3 py-1 rounded-full font-semibold shadow">
+        Coming soon
+      </span>
+      <span className="text-sm">•   06 Juli 2025</span>
+    </div>
+
+    {/* Tagar */}
+    <div className="flex gap-2 mt-4 flex-wrap justify-start md:justify-start text-xs md:text-sm text-white/80 lg:-ml-8">
+      {['#Romantic', '#Getmarried', '#Family', '#Documenter'].map((tag, idx) => (
+        <span
+          key={idx}
+          className="bg-gray-600 px-3 py-1 rounded-full border border-white/20 backdrop-blur-sm font-semibold"
+        >
+          {tag}
+        </span>
+      ))}
+    </div>
   </div>
 </section>
 )}
+
+
+{/* section 2 */}
+<section className="relative w-full text-white py-20 px-6 md:px-20 overflow-hidden">
+  {/* Background Parallax */}
+  <div
+    className="absolute inset-0 bg-fixed bg-center bg-cover z-0"
+    style={{ backgroundImage: "url('/prewed2.jpg')" }}
+  >
+    <div className="w-full h-full bg-black/80"></div> {/* Overlay */}
+  </div>
+
+  {/* Konten di atas background */}
+  <motion.div
+    className="relative z-10 max-w-5xl mx-auto flex flex-col md:flex-row items-start gap-8"
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1, ease: 'easeOut' }}
+    viewport={{ once: true }}
+  >
+    {/* Gambar Kanan */}
+    <motion.div
+      className="w-full md:w-1/2 rounded-xl overflow-hidden shadow-2xl"
+      initial={{ opacity: 0, x: -60 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ duration: 1, delay: 0.2 }}
+    >
+      <img
+        src="/prewed2.jpg"
+        alt="Poster"
+        className="w-full h-auto object-cover ease-in-out duration-300 hover:scale-105 rounded-lg shadow-lg"
+      />
+    </motion.div>
+
+    {/* Konten Tulisan */}
+    <motion.div
+      className="w-full md:w-1/2 space-y-4"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, delay: 0.4 }}
+    >
+      <p className="uppercase text-red-500 text-sm font-semibold tracking-wide">Documenter</p>
+      <h2 className="text-3xl md:text-4xl font-extrabold leading-snug">Dito & Dini: Sebelum Hari H</h2>
+
+      <div className="flex items-center gap-4 text-sm text-white/80">
+        <span className="text-green-400 font-semibold">100% Match</span>
+        <span className="bg-white text-black px-2 rounded text-xs font-bold">SU</span>
+        <span>2025</span>
+        <span>1h 26m</span>
+      </div>
+
+      <div className="bg-red-600 text-white w-fit px-4 py-1 rounded-full text-sm font-semibold shadow-md">
+        Coming soon on Sunday, 06 July 2025
+      </div>
+
+      <p className="text-sm md:text-base text-white/80">
+        Setelah Dito dan Dini dipertemukan dalam situasi yang tepat, di mana keduanya telah siap untuk memulai hubungan bersama, tibalah mereka di awal perjalanan baru menuju pernikahan.
+      </p>
+
+      <p className="text-xs italic text-white/50 border-t border-white/10 pt-2">
+        "Segala sesuatu Kami ciptakan berpasang-pasangan agar kamu mengingat (kebesaran Allah)" – (Q.S Az-Zariyah: 49)
+      </p>
+    </motion.div>
+  </motion.div>
+</section>
+
+{/* section 3 breaking news */}
+<section className="relative w-full bg-black text-white px-6 py-16 md:py-24">
+  <motion.div
+    className="max-w-3xl mx-auto flex flex-col items-center"
+    initial={{ opacity: 0, x: 100 }}  // Mulai dari luar layar kanan
+    whileInView={{ opacity: 1, x: 0 }}  // Masuk ke posisi normal
+    exit={{ opacity: 0, x: 100 }}  // Keluar dan pergi ke kanan
+    transition={{ duration: 1 }}
+    viewport={{ once: false }}  // Efek animasi saat keluar dan masuk kembali
+  >
+    <h3 className="text-2xl md:text-3xl font-bold mb-6 text-center w-full">
+      Breaking News 📺
+    </h3>
+
+    {/* Gambar dengan overlay teks */}
+    <motion.div
+      className="w-full aspect-[3/2] md:aspect-video rounded-xl overflow-hidden relative shadow-xl"
+      initial={{ opacity: 0, x: 100 }}  // Gambar mulai dari kanan
+      whileInView={{ opacity: 1, x: 0 }}  // Gambar bergerak ke posisi normal saat digulir
+      transition={{ duration: 0.8 }}
+    >
+      <img
+        src="/prewed3.jpg"
+        alt="Pengumuman"
+        className="w-full h-full object-cover ease-in-out duration-300 hover:scale-105"
+      />
+    </motion.div>
+
+    {/* Teks */}
+    <motion.div
+      className="mt-6 text-left space-y-4 text-base leading-relaxed"
+      initial={{ opacity: 0, x: 100 }}  // Teks mulai dari kanan
+      whileInView={{ opacity: 1, x: 0 }}  // Teks bergerak ke posisi normal saat digulir
+      transition={{ duration: 1 }}
+    >
+      <p>
+        Halo! Kami ingin informasikan bahwa kami akan segera menikah, dan kamu jadi{" "}
+        <strong>1 dari 100 orang</strong> yang kami undang untuk hadir di hari bahagia kami!
+      </p>
+      <p>
+        Perlu diketahui, karena bersifat <em>intimate wedding</em> dan hanya mengundang orang terdekat, maka dari itu kami harapkan untuk{" "}
+        <strong>tidak menyebarluaskan</strong> informasi detail terkait hari pernikahan kami (misalnya, lokasi dan waktu acara).
+      </p>
+      <p>
+        Kami tunggu kedatangannya di hari bahagia kami ya!
+      </p>
+      <p className="pt-2 text-white/70">
+        Dengan penuh cinta
+      </p>
+    </motion.div>
+  </motion.div>
+</section>
+
+{/* section 4 */}
+<section className="bg-black text-white py-16 px-6 md:px-20">
+  <motion.div
+    className="max-w-5xl mx-auto"
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    viewport={{ once: false }} // Animasi tetap terjadi saat digulir tanpa refresh
+  >
+    <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center">Bride and Groom 💐</h3>
+
+    <div className="grid grid-cols-2 gap-6 md:gap-10">
+      
+      {/* Mempelai Wanita - Animasi Masuk dari Kiri */}
+      <motion.div
+        className="flex flex-col items-center text-center space-y-3"
+        initial={{ opacity: 0, x: -100 }}  // Mulai dari luar layar kiri
+        whileInView={{ opacity: 1, x: 0 }}  // Masuk ke posisi normal
+        transition={{ duration: 1, delay: 0.1 }}
+        viewport={{ once: false }}
+      >
+        <img
+          src="/dini1.jpg"
+          alt="Alya Fadilah M.R"
+          className="w-48 h-48 object-cover rounded-xl shadow-lg"
+        />
+        <motion.h4
+          className="text-lg md:text-xl font-semibold mt-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          viewport={{ once: false }}
+        >
+          Andi Ummmu Aulia Aiundini Tenrigangka
+        </motion.h4>
+        <motion.p
+          className="text-sm text-white/80"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          viewport={{ once: false }}
+        >
+          Putri dari <span className='font-semibold text-yellow-500'>Bapak Aferi Syamsidar Fudail</span> & <span className='font-semibold text-yellow-500'>Ibu Onny Tenriyana</span>
+        </motion.p>
+      </motion.div>
+
+      {/* Mempelai Pria - Animasi Masuk dari Kanan */}
+      <motion.div
+        className="flex flex-col items-center text-center space-y-3"
+        initial={{ opacity: 0, x: 100 }}  // Mulai dari luar layar kanan
+        whileInView={{ opacity: 1, x: 0 }}  // Masuk ke posisi normal
+        transition={{ duration: 1, delay: 0.2 }}
+        viewport={{ once: false }}
+      >
+        <img
+          src="/dito1.jpg"
+          alt="Yohan Putra Nugraha"
+          className="w-48 h-48 object-cover rounded-xl shadow-lg"
+        />
+        <motion.h4
+          className="text-lg md:text-xl font-semibold mt-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          viewport={{ once: false }}
+        >
+          Andhito Diaz Revandra
+        </motion.h4>
+        <motion.p
+          className="text-sm text-white/80"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          viewport={{ once: false }}
+        >
+          Putra dari <span className='font-semibold text-yellow-500'>Bapak Evansyah</span> & <span className='font-semibold text-yellow-500'>Ibu Dhyanchandra Patria Novimarmadewi</span>
+        </motion.p>
+      </motion.div>
+    </div>
+  </motion.div>
+</section>
+
+{/* section 5 */}
+<section className="bg-black text-white py-16 px-6 md:px-20">
+  <motion.div
+    className="max-w-4xl mx-auto"
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    viewport={{ once: false }}  // Animasi aktif saat scroll masuk dan keluar dari tampilan
+  >
+    <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center">Location 🗺️</h3>
+
+    {/* Grid 2 kolom di semua ukuran */}
+    <div className="grid grid-cols-2 gap-4 items-start">
+      
+      {/* Map - Animasi Masuk dari Kiri */}
+      <motion.div
+        className="rounded-xl overflow-hidden shadow-lg"
+        initial={{ opacity: 0, x: -100 }}  // Mulai dari kiri luar
+        whileInView={{ opacity: 1, x: 0 }}  // Bergerak ke posisi normal
+        transition={{ duration: 0.8 }}
+        viewport={{ once: false }}  // Animasi aktif setiap kali digulir
+      >
+        <iframe
+          title="Lokasi Warna-Warni Resto"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.2643955185345!2d106.7594484!3d-6.488165899999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c3837c7a5057%3A0x5f75423673ba0355!2sRumah%20Pak%20Feri!5e0!3m2!1sen!2sid!4v1750087025165!5m2!1sen!2sid"
+          width="100%"
+          height="200"
+          allowFullScreen=""
+          loading="lazy"
+          className="w-full h-full border-0"
+        ></iframe>
+      </motion.div>
+
+      {/* Deskripsi Lokasi - Animasi Masuk dari Kanan */}
+      <motion.div
+        className="text-left"
+        initial={{ opacity: 0, x: 100 }}  // Mulai dari kanan luar
+        whileInView={{ opacity: 1, x: 0 }}  // Bergerak ke posisi normal
+        transition={{ duration: 0.8 }}
+        viewport={{ once: false }}  // Animasi aktif setiap kali digulir
+      >
+        <h4 className="text-base md:text-lg font-semibold mb-1">Rumah Pak Feri</h4>
+        <p className="text-xs md:text-sm text-white/80 mb-3 leading-snug">
+          Tonjong, <br />
+          Kec. Tajur Halang, Kabupaten Bogor
+        </p>
+        <a
+          href="https://maps.app.goo.gl/Nd4MGsK52M4WuNY66"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block bg-white text-black px-4 py-1.5 rounded-full text-xs font-medium hover:bg-red-600 hover:text-white transition"
+        >
+          Show location
+        </a>
+      </motion.div>
+    </div>
+  </motion.div>
+</section>
+
+{/* section 6 */}
+<section className="bg-black text-white py-16 px-6 md:px-20">
+  <motion.div
+    className="max-w-6xl mx-auto"
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    viewport={{ once: false }}
+  >
+    <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center animate__animated animate__fadeInUp">
+      Our Story Episodes 🎬
+    </h3>
+
+    <div className="space-y-10">
+      {[
+        {
+          title: "Episode 1: Pertemuan Pertama",
+          image: "/eps1.jpg",
+          description:
+            "Ditengah kejenuhan menghadapi rutinitas, Dito dan Dini dipertemukan dalam situasi dan waktu tak terduga...",
+          badge: "Eps 1",
+          badgeColor: "bg-red-600",
+        },
+        {
+          title: "Episode 2: Kencan Pertama",
+          image: "/eps2.jpg",
+          description:
+            "Setelah proses perkenalan lebih dalam, keberanian Dhito mengajak Dini berkencanmembuahkan hasil manis...",
+          badge: "Eps 2",
+          badgeColor: "bg-blue-600",
+        },
+        {
+          title: "Episode 3: Restu Keluarga",
+          image: "/eps3.jpg",
+          description:
+            "Setelah perjalanan selama dua tahun, Dhito dan Dini memberanikan diri untuk berkenalan kepada orangtua...",
+          badge: "Eps 3",
+          badgeColor: "bg-green-600",
+        },
+        {
+          title: "Episode 4: The End of Beginning",
+          image: "/eps4.jpg",
+          description:
+            "Genap empat tahun penantian, akhirnya kapal mereka mulai berlayar, dipenuhi dengan dukungan dan doa...",
+          badge: "Eps 4",
+          badgeColor: "bg-yellow-600",
+        },
+      ].map((episode, idx) => (
+        <motion.div
+          key={idx}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gradient-to-br from-zinc-900 to-gray-800 p-4 rounded-2xl shadow-2xl ring-1 ring-white/10 md:bg-transparent md:p-0 md:shadow-none md:ring-0"
+          initial={{ opacity: 0, y: 80 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: idx * 0.2 }}
+          viewport={{ once: false }}
+        >
+          {/* Gambar (kiri) */}
+          <motion.div
+            className="w-full rounded-xl overflow-hidden shadow-lg"
+            initial={{ opacity: 0, x: -100 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: idx * 0.2 }}
+            whileHover={{
+              scale: 1.05,
+              rotateY: 10,
+              rotateX: 10,
+              boxShadow: "0 25px 50px rgba(0,0,0,0.4)",
+              transition: { duration: 0.5 },
+            }}
+          >
+            <img
+              src={episode.image}
+              alt={episode.title}
+              className="w-full h-full object-cover rounded-lg transition duration-300"
+            />
+          </motion.div>
+
+          {/* Penjelasan Episode (kanan) */}
+          <motion.div
+            className="w-full flex flex-col justify-center"
+            initial={{ opacity: 0, x: 100 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: idx * 0.2 }}
+            viewport={{ once: false }}
+          >
+            <motion.span
+              className={`inline-block w-fit px-4 py-1 rounded-full text-white text-xs font-bold ${episode.badgeColor} animate-bounce mb-3`}
+              whileHover={{
+                scale: 1.1,
+                rotate: 8,
+                textShadow: "0 0 12px white",
+              }}
+              transition={{ type: "spring", stiffness: 400 }}
+            >
+              {episode.badge}
+            </motion.span>
+
+            <motion.h4
+              className="text-xl font-bold mb-2 text-shadow-md"
+              whileHover={{ scale: 1.03, color: "#facc15" }}
+            >
+              {episode.title}
+            </motion.h4>
+
+            <motion.p
+              className="text-base text-white/80 leading-relaxed"
+              whileHover={{
+                scale: 1.02,
+                color: "#f9fafb",
+                textShadow: "0 0 10px rgba(255,255,255,0.5)",
+              }}
+            >
+              {episode.description}
+            </motion.p>
+          </motion.div>
+        </motion.div>
+      ))}
+    </div>
+  </motion.div>
+</section>
+
+{/* section 7 */}
+<section className="text-white py-16 px-6 md:px-20">
+  <motion.div
+    className="max-w-6xl mx-auto"
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    viewport={{ once: false }} // ✅ Animasi aktif setiap scroll
+  >
+    <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center">
+      Top 10 Moment Favorit
+    </h3>
+
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      {[
+        { img: '/AdaApaDengan Cinta.png', badge: 'Eksklusif', badgeColor: 'bg-red-500' },
+        { img: '/CrashLandingOnYou.png', badge: 'Premium 👑', badgeColor: 'bg-red-500' },
+        { img: '/DDThe Explorer.png', badge: 'Top 10', badgeColor: 'bg-red-500' },
+        { img: '/DuaLatarBiru.png', badge: 'Premium 👑', badgeColor: 'bg-red-500' },
+        { img: '/KeluargaCemara.png', badge: 'Our Favorite', badgeColor: 'bg-red-500' },
+        { img: '/LaLaLand.png', badge: 'Eksklusif 10', badgeColor: 'bg-red-500' },
+        { img: '/NantiKitaCeritaTentangHariIni.png', badge: 'Top 5', badgeColor: 'bg-red-500' },
+        { img: '/PernikahanDini.png', badge: 'Top 3', badgeColor: 'bg-red-700' },
+        { img: '/ReadyOrNot.png', badge: 'Top 2', badgeColor: 'bg-pink-700' },
+        { img: '/WhenLifeGivesYouTangerines.png', badge: 'Top 1', badgeColor: 'bg-pink-500' },
+      ].map((item, idx) => (
+        <motion.div
+          key={idx}
+          className="relative rounded-xl overflow-hidden shadow-xl group cursor-pointer bg-zinc-900/40 backdrop-blur-md perspective-1000"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: idx * 0.07, duration: 0.5 }}
+          viewport={{ once: false }} // ✅ animasi bisa muncul tiap scroll
+          whileHover={{
+            scale: 1.05,
+            rotateX: -5,
+            rotateY: 8,
+            transition: { duration: 0.4, ease: 'easeOut' },
+          }}
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <img
+            src={item.img}
+            alt={item.title}
+            className="w-full h-full object-cover aspect-[3/4] transform group-hover:scale-105 transition duration-300 rounded-lg"
+          />
+
+          {/* Overlay judul */}
+          <div className="absolute inset-0 flex items-end p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+            <h4 className="text-sm font-bold group-hover:text-yellow-400 transition">
+              {item.title}
+            </h4>
+          </div>
+
+          {/* Badge */}
+          {item.badge && (
+            <motion.div
+              className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-semibold text-white ${item.badgeColor}`}
+              animate={{ y: [0, -2, 0] }}
+              transition={{ repeat: Infinity, duration: 1.2 }}
+            >
+              {item.badge}
+            </motion.div>
+          )}
+        </motion.div>
+      ))}
+    </div>
+  </motion.div>
+</section>
+
+
+
+{/* section 8 */}
+<section className="bg-black text-white py-16 px-6 md:px-20">
+  <motion.div
+    className="max-w-xl mx-auto text-center"
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    viewport={{ once: true }}
+  >
+    <h3 className="text-2xl md:text-3xl font-bold mb-6">Daftar Kehadiranmu 💌</h3>
+    <p className="text-sm md:text-base text-white/80 mb-6 leading-relaxed">
+      Kami sangat senang bisa berbagi momen spesial ini bersama kamu.
+      Mohon konfirmasi kehadiranmu melalui link berikut ya! ✨
+    </p>
+
+    <button
+      onClick={() => window.location.href = 'https://bit.ly/rsvp-dito-dini'} // Ganti dengan link RSVP kamu
+      className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full shadow transition duration-300"
+    >
+      Konfirmasi Kehadiran
+    </button>
+  </motion.div>
+</section>
+
+
+
+
+
+
 
 
 
 
 
  {/* Top 10 Section */}
-<h3 className="text-xl text-white ml-10 mt-5 -mb-5 font-bold">Top 10 Momen Favorit Kami</h3>
+{/* <h3 className="text-xl text-white ml-10 mt-5 -mb-5 font-bold">Top 10 Momen Favorit Kami</h3>
 <div className="bg-black py-8">
   <div className="flex gap-6 overflow-x-auto px-8 scrollbar-hide">
     {[
@@ -466,36 +827,36 @@ useEffect(() => {
       <div
         key={idx}
         className="relative w-44 h-64 flex-shrink-0 group overflow-hidden rounded-xl border-2 border-black shadow-lg hover:shadow-red-500 transition-all duration-300"
-      >
+      > */}
         {/* Background image */}
-        <img
+        {/* <img
           src={item.img}
           alt={item.title}
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
-        />
+        /> */}
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+        {/* <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div> */}
 
         {/* Detail Text */}
-       <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 z-20 opacity-0 group-hover:opacity-100 transform translate-y-8 group-hover:translate-y-0 transition-all duration-300 ease-in-out">
+       {/* <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 z-20 opacity-0 group-hover:opacity-100 transform translate-y-8 group-hover:translate-y-0 transition-all duration-300 ease-in-out">
           <h4 className="text-white text-sm font-bold">{item.title}</h4>
           <p className="text-gray-300 text-xs mt-1">{item.desc}</p>
-        </div>
+        </div> */}
 
         {/* Badge Premium */}
-        <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full shadow">
-          PREMIUM
+        {/* <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full shadow"> */}
+          {/* PREMIUM
         </div>
       </div>
     ))}
   </div>
-</div>
+</div> */}
 
 
 {/* Form Ucapan & Daftar Wishes */}
 <section className="bg-black px-6 py-10 text-white text-center">
-  <h3 className="text-2xl font-bold mb-6">Tulis Ucapan & Doa</h3>
+  <h3 className="text-2xl font-bold mb-6">Wish For The Couple </h3>
   <form
     onSubmit={(e) => {
       e.preventDefault();
@@ -545,6 +906,37 @@ useEffect(() => {
   </div>
 </section>
 
+{/* penutup */}
+<section
+  className="relative w-full text-white py-20 px-6 md:px-20 bg-center bg-cover overflow-hidden
+             bg-scroll md:bg-fixed"
+  style={{ backgroundImage: "url('/prewed2.jpg')" }} // ganti dengan file final
+>
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-black/70 z-0" />
+
+  {/* Konten */}
+  <motion.div
+    className="relative z-10 max-w-xl mx-auto text-center"
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    viewport={{ once: true }}
+  >
+    <h3 className="text-2xl md:text-3xl font-bold mb-6">Sampai Jumpa di Hari Bahagia Kami 🌟</h3>
+    <p className="text-sm md:text-base text-white/90 leading-relaxed">
+      Terima kasih telah menjadi bagian dari cerita cinta kami. <br />
+      Dengan penuh rasa syukur, kami menantikan kehadiranmu di hari yang sangat berarti ini.
+    </p>
+    <p className="mt-6 italic text-xs text-white/60">
+      “Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu…” <br />
+      – (Q.S. Ar-Rum: 21)
+    </p>
+  </motion.div>
+</section>
+
+
+
 
 
 
@@ -575,7 +967,7 @@ useEffect(() => {
               />
             ))}
             <motion.h1
-              className="text-8xl font-bold text-red-600 z-10 font-bebas"
+              className="text-8xl lg:text-8xl font-bold text-red-600 z-10 font-bebas"
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1.5 }}
@@ -647,6 +1039,17 @@ useEffect(() => {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;     /* Firefox */
   }
+    /* styles/global.css atau di tailwind layer base */
+body::-webkit-scrollbar {
+  width: 0.4em;
+}
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+body::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
       
       `}</style>
     </div>
