@@ -25,7 +25,7 @@ export default function WeddingInvitation() {
 
 
   const profiles = [
-  { id: 'primary',   name: 'Ditho & Dini',      avatar: '/Netflix-avatar.png' },];
+  { id: 'primary',   name: 'Dhito & Dini',      avatar: '/Netflix-avatar.png' },];
   const [phase, setPhase] = useState('intro'); // intro | profile | main
   const [selectedProfile, setSelectedProfile] = useState(null);
 
@@ -363,7 +363,7 @@ useEffect(() => {
       transition={{ duration: 1, delay: 0.4 }}
     >
       <p className="uppercase text-red-500 text-sm font-semibold tracking-wide">Documenter</p>
-      <h2 className="text-3xl md:text-4xl font-extrabold leading-snug">Ditho & Dini: Sebelum Hari H</h2>
+      <h2 className="text-3xl md:text-4xl font-extrabold leading-snug">Dhito & Dini: Sebelum Hari H</h2>
 
       <div className="flex items-center gap-4 text-sm text-white/80">
         <span className="text-green-400 font-semibold">100% Match</span>
@@ -612,7 +612,7 @@ useEffect(() => {
           title: "Episode 1: Pertemuan Pertama",
           image: "/eps1.jpg",
           description:
-            "Ditengah kejenuhan menghadapi rutinitas, Ditho dan Dini dipertemukan dalam situasi dan waktu tak terduga...",
+            "Ditengah kejenuhan menghadapi rutinitas, Dhito dan Dini dipertemukan dalam situasi dan waktu tak terduga...",
           badge: "Eps 1",
           badgeColor: "bg-red-600",
         },
