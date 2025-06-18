@@ -25,7 +25,7 @@ export default function WeddingInvitation() {
 
 
   const profiles = [
-  { id: 'primary',   name: 'Dito & Dini',      avatar: '/Netflix-avatar.png' },];
+  { id: 'primary',   name: 'Ditho & Dini',      avatar: '/Netflix-avatar.png' },];
   const [phase, setPhase] = useState('intro'); // intro | profile | main
   const [selectedProfile, setSelectedProfile] = useState(null);
 
@@ -471,7 +471,7 @@ useEffect(() => {
           transition={{ delay: 0.3, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Andi Ummmu Aulia Aiundini Tenrigangka
+          Andi Ummu Aulia Ainundini Tenrigangka
         </motion.h4>
         <motion.p
           className="text-sm text-white/80"
