@@ -377,7 +377,8 @@ useEffect(() => {
       </div>
 
       <p className="text-sm md:text-base text-white/80">
-        Setelah Dito dan Dini dipertemukan dalam situasi yang tepat, di mana keduanya telah siap untuk memulai hubungan bersama, tibalah mereka di awal perjalanan baru menuju pernikahan.
+        Dengan kuasa Allah SWT., Dini dan Dhito dipertemukan dalam situasi yang tepat. Arus membawa mereka ke jenjang yang lebih serius ketika keduanya bertekat untuk saling mengikat, menyempurnakan separuh agama.
+
       </p>
 
       <p className="text-xs italic text-white/50 border-t border-white/10 pt-2">
@@ -423,18 +424,15 @@ useEffect(() => {
       transition={{ duration: 1 }}
     >
       <p>
-        Halo! Kami ingin informasikan bahwa kami akan segera menikah, dan kamu jadi{" "}
-        <strong>1 dari 100 orang</strong> yang kami undang untuk hadir di hari bahagia kami!
+        <strong>We’re Getting Married!</strong>
       </p>
       <p>
-        Perlu diketahui, karena bersifat <em>intimate wedding</em> dan hanya mengundang orang terdekat, maka dari itu kami harapkan untuk{" "}
-        <strong>tidak menyebarluaskan</strong> informasi detail terkait hari pernikahan kami (misalnya, lokasi dan waktu acara).
+        Dengan segala kerendahan hati, kami mengundang <strong>Bapak/Ibu, sahabat, keluarga, serta
+        kerabat terkasih </strong>untuk hadir dan memberikan doa restu pada acara pernikahan kami.
+        Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu berkenan hadir.
       </p>
       <p>
-        Kami tunggu kedatangannya di hari bahagia kami ya!
-      </p>
-      <p className="pt-2 text-white/70">
-        Dengan penuh cinta
+        Mohon doanya agar acara kami diberi kelancaran dan keberkahan. 🤍
       </p>
     </motion.div>
   </motion.div>
@@ -578,8 +576,22 @@ useEffect(() => {
         </a>
       </motion.div>
     </div>
+
+    {/* Note Section */}
+    <motion.div
+      className="mt-10 text-center"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: false }}
+    >
+      <blockquote className="text-sm md:text-base text-white/80 italic">
+        "Jangan lupa pakai sepatu/sendal yang proper ya teman-teman karena acara outdoor"
+      </blockquote>
+    </motion.div>
   </motion.div>
 </section>
+
 
 {/* section 6 */}
 <section className="bg-black text-white py-16 px-6 md:px-20">
@@ -772,8 +784,6 @@ useEffect(() => {
   </motion.div>
 </section>
 
-
-
 {/* section 8 */}
 <section className="bg-black text-white py-16 px-6 md:px-20">
   <motion.div
@@ -790,7 +800,7 @@ useEffect(() => {
     </p>
 
     <button
-      onClick={() => window.location.href = 'https://bit.ly/rsvp-dito-dini'} // Ganti dengan link RSVP kamu
+      onClick={() => window.location.href = 'https://wedding-dito.vercel.app/guest-form'} // Ganti dengan link RSVP kamu
       className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full shadow transition duration-300"
     >
       Konfirmasi Kehadiran
@@ -891,7 +901,7 @@ useEffect(() => {
 
   {/* Recent Wishes */}
   <div className="mt-10 max-w-2xl mx-auto">
-    <h4 className="text-xl font-semibold mb-4">Ucapan Terbaru 💌</h4>
+    {/* <h4 className="text-xl font-semibold mb-4">Ucapan Terbaru 💌</h4> */}
     <ul className="space-y-4">
       {wishes.map((wish, i) => (
         <li
