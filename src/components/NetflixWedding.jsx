@@ -586,7 +586,7 @@ useEffect(() => {
       viewport={{ once: false }}
     >
       <blockquote className="text-xl md:text-base text-white/80 italic">
-        "Jangan lupa pakai sepatu/sendal yang proper ya teman-teman karena acara outdoor"
+        "Mohon gunakan alas kaki yang nyaman karena acara akan berlangsung di area taman "
       </blockquote>
     </motion.div>
   </motion.div>
