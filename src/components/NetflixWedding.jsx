@@ -585,7 +585,7 @@ useEffect(() => {
       transition={{ duration: 0.8 }}
       viewport={{ once: false }}
     >
-      <blockquote className="text-sm md:text-base text-white/80 italic">
+      <blockquote className="text-xl md:text-base text-white/80 italic">
         "Jangan lupa pakai sepatu/sendal yang proper ya teman-teman karena acara outdoor"
       </blockquote>
     </motion.div>
@@ -620,7 +620,7 @@ useEffect(() => {
           title: "Episode 2: Kencan Pertama",
           image: "/eps2.jpg",
           description:
-            "Setelah proses perkenalan lebih dalam, keberanian Dhito mengajak Dini berkencanmembuahkan hasil manis...",
+            "Setelah proses perkenalan lebih dalam, keberanian Dhito mengajak Dini berkencan membuahkan hasil manis...",
           badge: "Eps 2",
           badgeColor: "bg-blue-600",
         },
