@@ -19,6 +19,8 @@ export default function Attendance() {
   const totalPagesQR = Math.ceil(qrGuests.length / itemsPerPage);
   const totalPagesManual = Math.ceil(manualGuests.length / itemsPerPage);
 
+  const [vipGuests, setVipGuests] = useState([]);
+
   const currentQRGuests = qrGuests.slice(
     (currentPageQR - 1) * itemsPerPage,
     currentPageQR * itemsPerPage
@@ -46,6 +48,7 @@ export default function Attendance() {
         setAttendees(data);
         setQrGuests(data.filter((g) => g.source === "qr"));
         setManualGuests(data.filter((g) => g.source === "manual"));
+        setVipGuests(data.filter((g) => g.source === "vip"));
       }
 
       setLoading(false);
@@ -76,7 +79,7 @@ export default function Attendance() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-center text-green-700">📋 Daftar Kehadiran</h1>
+        <h1 className="text-3xl font-bold text-center text-green-700 font-serif">📋 Daftar Kehadiran</h1>
 
         {loading ? (
           <p className="text-center text-gray-400">⏳ Memuat data...</p>
@@ -84,7 +87,7 @@ export default function Attendance() {
           <>
             {/* QR Section */}
             <div id="qr-section" className="bg-white rounded-lg shadow-md p-4 mb-6">
-              <h2 className="text-xl font-bold text-green-700 mb-2">📲 Kehadiran via QR</h2>
+              <h2 className="text-xl font-bold text-green-700 mb-2 font-serif">📲 Kehadiran via QR</h2>
               {qrGuests.length === 0 ? (
                 <p className="text-center text-gray-400">Belum ada tamu dari QR.</p>
               ) : (
@@ -151,7 +154,7 @@ export default function Attendance() {
 
             {/* Manual Section */}
             <div id="manual-section" className="bg-white rounded-lg shadow-md p-4">
-              <h2 className="text-xl font-bold text-yellow-700 mb-2">📝 Kehadiran Manual</h2>
+              <h2 className="text-xl font-bold text-yellow-700 mb-2 font-serif">📝 Kehadiran Manual</h2>
               {manualGuests.length === 0 ? (
                 <p className="text-center text-gray-400">Belum ada tamu manual.</p>
               ) : (
@@ -216,6 +219,34 @@ export default function Attendance() {
               )}
             </div>
 
+            {/* VIP/VVIP Section */}
+            <div id="vip-section" className="bg-white rounded-lg shadow-md p-4 mt-6">
+              <h2 className="text-xl font-bold text-purple-700 mb-2 font-serif">🎖️ Kehadiran VIP & VVIP</h2>
+              {vipGuests.length === 0 ? (
+                <p className="text-center text-gray-400">Belum ada tamu VIP/VVIP.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {vipGuests.map((guest) => (
+                    <li
+                      key={guest.uuid || guest.name}
+                      className={`border-b pb-2 ${
+                        guest.category === "VVIP"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      } p-2 rounded`}
+                    >
+                      <p className="font-bold">👤 {guest.name}</p>
+                      <p className="text-sm text-gray-700">📛 {guest.status || "-"}</p>
+                      <p className="text-sm">
+                        {guest.category === "VVIP" ? "🔱 VVIP" : "🌟 VIP"}
+                      </p>
+                      <p className="text-xs text-gray-500">🕒 {new Date(guest.time).toLocaleString()}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 mt-6">
               <button
@@ -229,6 +260,12 @@ export default function Attendance() {
                 className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"
               >
                 🔙 Kembali ke Scanner
+              </button>
+              <button
+                onClick={() => navigate("/attendancevip")}
+                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"
+              >
+                  👑 Kembali ke halaman VIP/VVIP
               </button>
             </div>
           </>

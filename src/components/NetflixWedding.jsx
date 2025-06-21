@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaPlay, FaVolumeMute, FaVolumeUp, FaChevronDown } from 'react-icons/fa';
+import { FaPlay, FaVolumeMute, FaVolumeUp, } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient'; // atau sesuaikan path-nya
 
@@ -8,20 +8,23 @@ export default function WeddingInvitation() {
   const [introFinished, setIntroFinished] = useState(false);
   const [showPoster, setShowPoster] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
-  const [countdown, setCountdown] = useState('');
+  // const [countdown, setCountdown] = useState('');
   const audioRef = useRef(null);
   const [wishes, setWishes] = useState([]); 
   const [guestName, setGuestName] = useState('');
   const [wishInput, setWishInput] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const wishesPerPage = 5; // Jumlah per halaman
-  const indexOfLastWish = currentPage * wishesPerPage;
-  const indexOfFirstWish = indexOfLastWish - wishesPerPage;
-  const [showModal, setShowModal] = useState(false);
+  const audioRefIntro = useRef(null); // Audio untuk intro
+  const audioRefMain = useRef(null); // Audio untuk musik utama
+  const [audioBlocked, setAudioBlocked] = useState(false);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const wishesPerPage = 5; // Jumlah per halaman
+  // const indexOfLastWish = currentPage * wishesPerPage;
+  // const indexOfFirstWish = indexOfLastWish - wishesPerPage;
+  // const [showModal, setShowModal] = useState(false);
   // const [showRSVP,  setShowRSVP]  = useState(false); 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [bgIndex, setBgIndex] = useState(0);
-  const [hasInteracted, setHasInteracted] = useState(false);
+  // const [isPlaying, setIsPlaying] = useState(false);
+  // const [bgIndex, setBgIndex] = useState(0);
+  // const [hasInteracted, setHasInteracted] = useState(false);
 
 
   const profiles = [
@@ -30,18 +33,26 @@ export default function WeddingInvitation() {
   const [selectedProfile, setSelectedProfile] = useState(null);
 
 // Slideshow effect
-useEffect(() => {
-  let interval;
-  if (isPlaying) {
-    interval = setInterval(() => {
-      setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
-    }, 3000); // ganti gambar setiap 3 detik
-  } else {
-    clearInterval(interval);
-  }
-  return () => clearInterval(interval);
-}, [isPlaying]);
+// useEffect(() => {
+//   let interval;
+//   if (isPlaying) {
+//     interval = setInterval(() => {
+//       setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+//     }, 3000); // ganti gambar setiap 3 detik
+//   } else {
+//     clearInterval(interval);
+//   }
+//   return () => clearInterval(interval);
+// }, [isPlaying]);
 
+ useEffect(() => {
+  if (showIntro && audioRefIntro.current) {
+    audioRefIntro.current.muted = isMuted;
+    audioRefIntro.current.play().catch((e) =>
+      console.log("Autoplay blocked:", e)
+    );
+  }
+}, [showIntro, isMuted]);
 
 useEffect(() => {
   if (showIntro) {
@@ -53,16 +64,31 @@ useEffect(() => {
   }
 }, [showIntro]);
 
-
-  // Play audio on intro
- useEffect(() => {
-  if (showIntro && audioRef.current) {
-    audioRef.current.muted = isMuted;
-    audioRef.current.play().catch((e) =>
-      console.log("Autoplay blocked:", e)
-    );
+useEffect(() => {
+  if (phase === "main" && audioRefMain.current) {
+    audioRefMain.current
+      .play()
+      .then(() => {
+        console.log("🎵 Musik dimulai otomatis");
+        setAudioBlocked(false);
+      })
+      .catch((err) => {
+        console.warn("🔇 Autoplay gagal:", err);
+        setAudioBlocked(true); // Tombol akan muncul
+      });
   }
-}, [showIntro]);
+}, [phase]);
+
+
+//   // Play audio on intro
+//  useEffect(() => {
+//   if (showIntro && audioRef.current) {
+//     audioRef.current.muted = isMuted;
+//     audioRef.current.play().catch((e) =>
+//       console.log("Autoplay blocked:", e)
+//     );
+//   }
+// }, [showIntro]);
 
 
   // Scroll detection to hide poster
@@ -77,12 +103,39 @@ useEffect(() => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+
+  // useEffect(() => {
+  //   console.log("audioRef:", audioRef.current); 
+  // }, []);
+
+  // Fungsi untuk menangani klik pada profil dan memulai musik
+  const handleProfileClick = (profile) => {
+    setSelectedProfile(profile);
+    setPhase('main'); 
+
+    // console.log("audioRef:", audioRef.current);
+
+  //  if (audioRef.current) {
+  //   console.log("Audio is playing..."); 
+  //   audioRef.current.play().catch((e) => console.log("Autoplay blocked:", e)); 
+  // } else {
+  //   console.log("Audio element not found"); 
+  // }
+  };
+
   const toggleMute = () => {
     setIsMuted((prev) => {
       if (audioRef.current) audioRef.current.muted = !prev;
       return !prev;
     });
   };
+
+  // useEffect(() => {
+  //   if (showIntro && audioRef.current) {
+  //     audioRef.current.muted = isMuted; 
+  //     audioRef.current.play().catch((e) => console.log("Autoplay blocked:", e)); 
+  //   }
+  // }, [showIntro, isMuted]);
 
   const scrollToHero = () => {
     const el = document.getElementById('hero');
@@ -213,6 +266,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans overflow-x-hidden relative scroll-smooth">
+      <audio ref={audioRefMain} src="/sound/backsound.mp3" preload="auto" />
       <AnimatePresence>
       {phase === 'profile' && (
         <motion.section
@@ -233,7 +287,7 @@ useEffect(() => {
                 <button
                   key={p.id}
                   onClick={() => {
-                    setSelectedProfile(p);
+                    handleProfileClick(p);
                     setPhase('main'); // <-- Langsung ke halaman main!
                   }}
                   className={`
@@ -262,6 +316,20 @@ useEffect(() => {
 {phase === 'main' && (
 // Di dalam WeddingInvitation.jsx setelah pilih profile
  <section className="relative w-full h-screen scrollbar-hide overflow-hidden">
+  {/* Tombol Musik */}
+   {audioBlocked && (
+  <button
+    onClick={() => {
+      if (audioRefMain.current) {
+        audioRefMain.current.play();
+        setAudioBlocked(false);
+      }
+    }}
+    className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full z-[99] shadow-lg"
+  >
+    🔊 Mainkan Musik
+  </button>
+)}
   {/* Gambar sebagai latar belakang fullscreen */}
   <img
     src="/dito2.jpg" // ← ganti dengan gambar kamu
@@ -306,6 +374,12 @@ useEffect(() => {
       </span>
       <span className="text-sm">•   06 Juli 2025</span>
     </div>
+     {/* Kontrol Volume */}
+      <div className="absolute top-4 right-4 z-20">
+          <button onClick={toggleMute} className="text-white">
+              {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+          </button>
+      </div>
 
     {/* Tagar */}
     <div className="flex gap-2 mt-4 flex-wrap justify-start md:justify-start text-xs md:text-sm text-white/80 lg:-ml-8">
@@ -985,8 +1059,8 @@ useEffect(() => {
               NIKFLIX
             </motion.h1>
             <audio
-              ref={audioRef}
-              src="/netflix_sound.mp3"
+              ref={audioRefIntro}
+              src="/sound/netflix_sound.mp3"
               preload="auto"
             />
               {introFinished && (

@@ -212,7 +212,7 @@ export default function QRScanner({ attendees, setAttendees }) {
 
           <div id="qr-reader-temp" style={{ display: "none" }}></div>
 
-          <label className="mt-4 block w-full cursor-pointer text-center bg-emerald-500 text-white py-3 rounded-lg hover:bg-emerald-600 transition-all">
+          {/* <label className="mt-4 block w-full cursor-pointer text-center bg-emerald-500 text-white py-3 rounded-lg hover:bg-emerald-600 transition-all">
             📁 Upload Gambar QR
             <input
               type="file"
@@ -220,7 +220,7 @@ export default function QRScanner({ attendees, setAttendees }) {
               onChange={handleImageUpload}
               className="hidden"
             />
-          </label>
+          </label> */}
 
           {error && (
             <div className="mt-4 bg-red-100 text-red-700 p-3 rounded-md text-center font-semibold">

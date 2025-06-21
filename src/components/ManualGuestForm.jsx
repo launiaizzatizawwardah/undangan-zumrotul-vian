@@ -19,9 +19,8 @@ function ManualGuestForm() {
   const navigate = useNavigate();
 
   const tableOptions = [
-    { value: "REGULAR", label: "REGULAR" },
-    { value: "VIP ⭐", label: "VIP ⭐" },
-    { value: "VVIP ⭐⭐", label: "VVIP ⭐⭐" }
+    { value: "Perempuan", label: "Perempuan" },
+    { value: "Laki-Laki", label: "Laki-Laki" }
   ];
 
   const handleChange = (e) => {
@@ -90,10 +89,8 @@ const handleSave = async () => {
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
       <ToastContainer />
       <div className="bg-gray-900 p-10 rounded-3xl w-full max-w-xl space-y-6 shadow-2xl border border-gray-800 animate-fade-in">
-        <h2 className="text-3xl font-bold text-yellow-400 text-center">📝 Form Manual Tamu</h2>
-
+        <h2 className="text-2xl font-bold text-yellow-400 text-center">📝 Form Manual Tamu</h2>
         <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-xl">
-          <FaUser className="text-yellow-400 text-xl" />
           <input
             type="text"
             name="name"
@@ -105,7 +102,6 @@ const handleSave = async () => {
         </div>
 
         <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-xl">
-          <FaPhone className="text-yellow-400 text-xl" />
           <input
             type="number"
             name="phone"
@@ -117,7 +113,6 @@ const handleSave = async () => {
         </div>
 
         <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-xl">
-          <FaUsers className="text-yellow-400 text-xl" />
           <input
             type="number"
             name="guests"
@@ -129,13 +124,12 @@ const handleSave = async () => {
         </div>
 
         <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-xl">
-          <FaChair className="text-yellow-400 text-xl" />
           <div className="w-full">
             <Select
               options={tableOptions}
               value={tableOptions.find(opt => opt.value === data.table)}
               onChange={(selected) => setData((prev) => ({ ...prev, table: selected.value }))}
-              placeholder="Pilih Kategori Tempat Duduk"
+              placeholder="Pilih Jenis Kelamin "
               styles={{
                 control: (base) => ({
                   ...base,
