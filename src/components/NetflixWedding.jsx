@@ -3,6 +3,30 @@ import { FaPlay, FaVolumeMute, FaVolumeUp, } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient'; // atau sesuaikan path-nya
 
+function CopyRekening({ number }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(number);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Gagal salin:", err);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="mt-2 px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition-all"
+    >
+      {copied ? "✅ Disalin!" : "📋 Salin Nomor"}
+    </button>
+  );
+}
+
+
 export default function WeddingInvitation() {
   const [showIntro, setShowIntro] = useState(true);
   const [introFinished, setIntroFinished] = useState(false);
@@ -25,6 +49,8 @@ export default function WeddingInvitation() {
   // const [isPlaying, setIsPlaying] = useState(false);
   // const [bgIndex, setBgIndex] = useState(0);
   // const [hasInteracted, setHasInteracted] = useState(false);
+
+  
 
 
   const profiles = [
@@ -882,63 +908,33 @@ useEffect(() => {
   </motion.div>
 </section>
 
+{/* section 9 */}
+<section className="bg-white dark:bg-black py-10 px-6 md:px-16 text-center">
+  <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+    🎁 Kirim Hadiah Pernikahan
+  </h2>
+  <p className="text-gray-600 dark:text-gray-300 mb-6">
+    Jika Bapak/Ibu/Saudara berhalangan hadir, doa restu sudah sangat berarti bagi kami. 
+    Namun jika ingin memberikan hadiah, berikut rekening kami:
+  </p>
 
+  <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto text-left">
+    <div className="border p-4 rounded-lg shadow bg-gray-100 dark:bg-gray-800 relative">
+      <p className="text-sm text-gray-500 dark:text-gray-400">Atas Nama</p>
+      <p className="text-lg font-semibold text-gray-900 dark:text-white">Andhito Diaz Revandra</p>
+      <p className="text-sm mt-2 text-gray-700 dark:text-gray-300">BCA • 1234567890</p>
 
-
-
-
-
-
-
-
-
- {/* Top 10 Section */}
-{/* <h3 className="text-xl text-white ml-10 mt-5 -mb-5 font-bold">Top 10 Momen Favorit Kami</h3>
-<div className="bg-black py-8">
-  <div className="flex gap-6 overflow-x-auto px-8 scrollbar-hide">
-    {[
-      { img: "/AdaApaDengan Cinta.png", title: "Ada Apa Dengan Cinta", desc: "Momen penuh nostalgia dan cinta." },
-      { img: "/CrashLandingOnYou.png", title: "Crash Landing", desc: "Pertemuan tak terduga yang manis." },
-      { img: "/DDThe Explorer.png", title: "DD The Explorer", desc: "Petualangan seru dan penuh tawa." },
-      { img: "/DuaLatarBiru.png", title: "Dua Latar Biru", desc: "Romansa yang tenang dan dalam." },
-      { img: "/KeluargaCemara.png", title: "Keluarga Cemara", desc: "Hangatnya kebersamaan keluarga." },
-      { img: "/LaLaLand.png", title: "La La Land", desc: "Drama musikal yang menginspirasi." },
-      { img: "/NantiKitaCeritaTentangHariIni.png", title: "NKCTHI", desc: "Cerita tentang keluarga dan luka lama." },
-      { img: "/PernikahanDini.png", title: "Pernikahan Dini", desc: "Awal kisah cinta mereka." },
-      { img: "/ReadyOrNot.png", title: "Ready or Not", desc: "Cinta dan kekacauan menyatu." },
-      { img: "/WhenLifeGivesYouTangerines.png", title: "When Life Gives You Tangerines", desc: "Cinta dan Restu Orang Tua." },
-    ].map((item, idx) => (
-      <div
-        key={idx}
-        className="relative w-44 h-64 flex-shrink-0 group overflow-hidden rounded-xl border-2 border-black shadow-lg hover:shadow-red-500 transition-all duration-300"
-      > */}
-        {/* Background image */}
-        {/* <img
-          src={item.img}
-          alt={item.title}
-          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
-        /> */}
-
-        {/* Overlay */}
-        {/* <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div> */}
-
-        {/* Detail Text */}
-       {/* <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 z-20 opacity-0 group-hover:opacity-100 transform translate-y-8 group-hover:translate-y-0 transition-all duration-300 ease-in-out">
-          <h4 className="text-white text-sm font-bold">{item.title}</h4>
-          <p className="text-gray-300 text-xs mt-1">{item.desc}</p>
-        </div> */}
-
-        {/* Badge Premium */}
-        {/* <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full shadow"> */}
-          {/* PREMIUM
-        </div>
-      </div>
-    ))}
+      <CopyRekening number="1234567890" />
+    </div>
   </div>
-</div> */}
+
+  <p className="text-xs text-gray-400 mt-6 italic">
+    Terima kasih atas doa dan perhatiannya. 💌
+  </p>
+</section>
 
 
-{/* Form Ucapan & Daftar Wishes */}
+{/* section 10 Form Ucapan & Daftar Wishes */}
 <section className="bg-black px-6 py-10 text-white text-center">
   <h3 className="text-2xl font-bold mb-6">Wish For The Couple </h3>
   <form
@@ -990,7 +986,7 @@ useEffect(() => {
   </div>
 </section>
 
-{/* penutup */}
+{/* section 11 penutup */}
 <section
   className="relative w-full text-white py-20 px-6 md:px-20 bg-center bg-cover overflow-hidden
              bg-scroll md:bg-fixed"
