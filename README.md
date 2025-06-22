@@ -1,6 +1,6 @@
 ##Preview 
-![Screenshot](/public/screenshot.png)
-![Screenshot](/public/screenshot2.png)
+![Screenshot](/public/ss2.png)
+![Screenshot](/public/ss1.png)
 
 
 to clone project :
