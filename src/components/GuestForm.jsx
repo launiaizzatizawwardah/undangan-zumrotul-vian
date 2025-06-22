@@ -65,6 +65,7 @@ function App() {
         name: data.name,
         phone: data.phone,
         guests: data.guests,
+        category: 'reguler',
         bookingCode,
         createdAt: new Date().toLocaleString(),
       };
@@ -183,6 +184,7 @@ function App() {
     name: data.name,
     phone: data.phone,
     guests: data.guests,
+    category: 'reguler',
   };
   const qrContent = JSON.stringify(qrDataMinimal);
 
@@ -222,7 +224,7 @@ Saya Sudah Mengisi Form Dan Membuat Kode QR Dan Akan Di Scan Di Acara Pernikahan
                 Andhito & Dini
               </h1>
             </div>
-            <p className="text-sm text-gray-400 font-semibold">06 Juli 2025 - 14:00 WIB</p>
+            <p className="text-sm text-gray-400 font-bold">06 Juli 2025</p>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:gap-3 bg-gray-800 p-4 rounded-2xl">
@@ -278,13 +280,13 @@ Saya Sudah Mengisi Form Dan Membuat Kode QR Dan Akan Di Scan Di Acara Pernikahan
             {loading ? "Membuat Tiket..." : "Buat Tiket"}
           </button>
 
-          <button
+          {/* <button
             type="button"
             onClick={() => navigate("/manualGuestForm")}
             className="w-full bg-gray-600 hover:bg-gray-700 text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2"
           >
             📋 Isi Form Manual
-          </button>
+          </button> */}
 
           <div className="text-center text-sm pt-2">
             <a

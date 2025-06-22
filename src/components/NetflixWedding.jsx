@@ -54,7 +54,7 @@ export default function WeddingInvitation() {
 
 
   const profiles = [
-  { id: 'primary',   name: 'Dhito & Dini',      avatar: '/Netflix-avatar.png' },];
+  { id: 'primary',   name: 'You',      avatar: '/Netflix-avatar.png' },];
   const [phase, setPhase] = useState('intro'); // intro | profile | main
   const [selectedProfile, setSelectedProfile] = useState(null);
 
@@ -149,12 +149,14 @@ useEffect(() => {
   // }
   };
 
-  const toggleMute = () => {
-    setIsMuted((prev) => {
-      if (audioRef.current) audioRef.current.muted = !prev;
-      return !prev;
-    });
-  };
+ const toggleMute = () => {
+  setIsMuted((prev) => {
+    const newMuteState = !prev;
+    if (audioRefIntro.current) audioRefIntro.current.muted = newMuteState;
+    if (audioRefMain.current) audioRefMain.current.muted = newMuteState;
+    return newMuteState;
+  });
+};
 
   // useEffect(() => {
   //   if (showIntro && audioRef.current) {
@@ -326,14 +328,10 @@ useEffect(() => {
                     alt={p.name}
                     className="w-24 h-24 rounded-md object-cover"
                   />
-                  <span className="text-sm text-gray-200">{p.name}</span>
+                  <span className="text-xl text-gray-200 font-bold">{p.name}</span>
                 </button>
               ))}
             </div>
-          </div>
-           {/* Add "You" text with white border */}
-          <div className="mt-2 border-2 border-white rounded-xl px-6 py-2 text-white font-semibold h">
-            You
           </div>
         </motion.section>
       )}
@@ -907,32 +905,6 @@ useEffect(() => {
     </button>
   </motion.div>
 </section>
-
-{/* section 9 */}
-<section className="bg-white dark:bg-black py-10 px-6 md:px-16 text-center">
-  <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
-    🎁 Kirim Hadiah Pernikahan
-  </h2>
-  <p className="text-gray-600 dark:text-gray-300 mb-6">
-    Jika Bapak/Ibu/Saudara berhalangan hadir, doa restu sudah sangat berarti bagi kami. 
-    Namun jika ingin memberikan hadiah, berikut rekening kami:
-  </p>
-
-  <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto text-left">
-    <div className="border p-4 rounded-lg shadow bg-gray-100 dark:bg-gray-800 relative">
-      <p className="text-sm text-gray-500 dark:text-gray-400">Atas Nama</p>
-      <p className="text-lg font-semibold text-gray-900 dark:text-white">Andhito Diaz Revandra</p>
-      <p className="text-sm mt-2 text-gray-700 dark:text-gray-300">BCA • 1234567890</p>
-
-      <CopyRekening number="1234567890" />
-    </div>
-  </div>
-
-  <p className="text-xs text-gray-400 mt-6 italic">
-    Terima kasih atas doa dan perhatiannya. 💌
-  </p>
-</section>
-
 
 {/* section 10 Form Ucapan & Daftar Wishes */}
 <section className="bg-black px-6 py-10 text-white text-center">

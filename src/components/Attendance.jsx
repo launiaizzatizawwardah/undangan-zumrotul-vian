@@ -108,15 +108,15 @@ export default function Attendance() {
                         >
                           <p><strong>👤 {guest.name}</strong></p>
                           <p>📱 {guest.phone} | 👥 {guest.guests} tamu</p>
-                          <span className="font-semibold">
-                            📍 {guest.table?.toUpperCase().includes("VVIP") ? (
-                              <span className="text-yellow-600">VVIP ⭐⭐</span>
-                            ) : guest.table?.toUpperCase().includes("VIP") ? (
-                              <span className="text-yellow-500">VIP ⭐</span>
-                            ) : (
-                              <span className="text-gray-700">{guest.table}</span>
-                            )}
-                          </span>
+                          <span className="font-semibold flex items-center gap-2">
+                        📍 {guest.table?.toUpperCase().includes("VVIP") ? (
+                          <span className="text-yellow-600">VVIP ⭐⭐</span>
+                        ) : guest.table?.toUpperCase().includes("VIP") ? (
+                          <span className="text-yellow-500">VIP ⭐</span>
+                        ) : (
+                          <span className="text-blue-600 font-semibold">Reguler</span> // ← Tambahan label Reguler
+                        )}
+                      </span>
                           <p className="text-xs text-gray-400">UUID: {guest.uuid}</p>
                         </li>
                       ))}
@@ -175,15 +175,16 @@ export default function Attendance() {
                         >
                           <p><strong>👤 {guest.name}</strong></p>
                           <p>📱 {guest.phone} | 👥 {guest.guests} tamu</p>
-                          <span className="font-semibold">
-                            📍 {guest.table?.toUpperCase().includes("VVIP") ? (
-                              <span className="text-yellow-600">VVIP ⭐⭐</span>
-                            ) : guest.table?.toUpperCase().includes("VIP") ? (
-                              <span className="text-yellow-500">VIP ⭐</span>
-                            ) : (
-                              <span className="text-gray-700">{guest.table}</span>
-                            )}
-                          </span>
+                          <span className="font-semibold flex flex-col">
+                          <span>📍 {guest.table}</span>
+                          {guest.category?.toUpperCase() === "VVIP" ? (
+                            <span className="text-yellow-600">🔱 VVIP</span>
+                          ) : guest.category?.toUpperCase() === "VIP" ? (
+                            <span className="text-yellow-500">🌟 VIP</span>
+                          ) : (
+                            <span className="text-blue-600">🔰 Reguler</span>
+                          )}
+                        </span>
                           <p className="text-xs text-gray-400">UUID: {guest.uuid}</p>
                         </li>
                       ))}
