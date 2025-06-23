@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import GuestForm from "./components/GuestForm";
 import QRScanner from "./components/QRScanner";
 import Attendance from "./components/Attendance";
-import NetflixWedding from "./components/NetflixWedding";
+import TheWedding from "./components/TheWedding";
 import ManualGuestForm from "./components/ManualGuestForm";
 // import Website from "./components/Website";
 import AttendanceVIP from "./components/AttendanceVIP"; // ganti path sesuai struktur Anda
@@ -14,8 +14,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<TheWedding />} />
         <Route
-          path="/"
+          path="/QRScanner"
           element={<QRScanner setAttendees={setAttendees} attendees={attendees} />}
         />
         <Route path="/guest-Form" element={<GuestForm />} />
@@ -24,7 +25,7 @@ function App() {
           element={<Attendance attendees={attendees} setAttendees={setAttendees} />}
         />
         <Route path="/manualGuestForm" element={<ManualGuestForm />} />
-        <Route path="/NetflixWedding" element={<NetflixWedding />} />
+        {/* <Route path="/TheWedding" element={<TheWedding />} /> */}
         {/* <Route path="/contoh" element={<Website />} /> */}
         <Route path="attendancevip" element={<AttendanceVIP />} />
       </Routes>
