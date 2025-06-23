@@ -898,7 +898,7 @@ useEffect(() => {
     </p>
 
     <button
-      onClick={() => window.location.href = 'https://wedding-dito.vercel.app/guest-form'} // Ganti dengan link RSVP kamu
+      onClick={() => window.location.href = 'https://theweddingofdinidhito.vercel.app/guest-form'} // Ganti dengan link RSVP kamu
       className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full shadow transition duration-300"
     >
       Konfirmasi Kehadiran
