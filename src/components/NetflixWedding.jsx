@@ -480,7 +480,7 @@ useEffect(() => {
       </p>
 
       <p className="text-xs italic text-white/50 border-t border-white/10 pt-2">
-        "Segala sesuatu Kami ciptakan berpasang-pasangan agar kamu mengingat (kebesaran Allah)" – (Q.S Az-Zariyah: 49)
+        "Segala sesuatu Kami ciptakan berpasang-pasangan agar kamu mengingat (kebesaran Allah)" – (Q.S Az-Zariyat: 49)
       </p>
     </motion.div>
   </motion.div>
