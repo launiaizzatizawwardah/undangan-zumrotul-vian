@@ -941,21 +941,24 @@ useEffect(() => {
     </button>
   </form>
 
-  {/* Recent Wishes */}
-  <div className="mt-10 max-w-2xl mx-auto">
-    {/* <h4 className="text-xl font-semibold mb-4">Ucapan Terbaru 💌</h4> */}
-    <ul className="space-y-4">
-      {wishes.map((wish, i) => (
-        <li
-          key={i}
-          className="bg-gray-800 px-4 py-3 rounded-lg border border-gray-700"
-        >
-          <p className="text-sm text-gray-300">Dari: <span className="font-semibold text-white">{wish.name}</span></p>
-          <p className="mt-1 text-base text-white italic">“{wish.message}”</p>
-        </li>
-      ))}
-    </ul>
+ {/* Recent Wishes */}
+<div className="mt-10 max-w-2xl mx-auto">
+  <div className="max-h-96 overflow-y-scroll pr-2 space-y-4 ">
+    {wishes.map((wish, i) => (
+      <div
+        key={i}
+        className="bg-gray-800 px-4 py-3 rounded-lg border border-gray-700"
+      >
+        <p className="text-sm text-gray-300">
+          Dari: <span className="font-semibold text-white">{wish.name}</span>
+        </p>
+        <p className="mt-1 text-base text-white italic">“{wish.message}”</p>
+      </div>
+    ))}
   </div>
+</div>
+
+
 </section>
 
 {/* section 11 penutup */}
