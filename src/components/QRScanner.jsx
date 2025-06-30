@@ -3,13 +3,13 @@ import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 
-export default function QRScanner({ attendees, setAttendees }) {
+export default function QRScanner() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cameraList, setCameraList] = useState([]);
-  const [cameraFacing, setCameraFacing] = useState("user"); // ✅ default: kamera depan
+  const [currentCameraIndex, setCurrentCameraIndex] = useState(0); // ✅ Kamera index aktif
 
   const scannerRef = useRef(null);
   const containerRef = useRef(null);
@@ -90,22 +90,15 @@ export default function QRScanner({ attendees, setAttendees }) {
 
     Html5Qrcode.getCameras()
       .then((devices) => {
-        console.log("📸 Daftar kamera:", devices);
+        console.log("📸 Semua kamera:", devices);
         if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
         setCameraList(devices);
 
-        // ✅ Pilih berdasarkan index, bukan label
-        let selectedCameraId;
-        if (cameraFacing === "user") {
-          selectedCameraId = devices[0]?.id; // kamera depan
-        } else {
-          selectedCameraId = devices[1]?.id || devices[0]?.id; // kamera belakang
-        }
-
-        console.log("🎯 Kamera dipilih:", selectedCameraId, "👉 facing:", cameraFacing);
+        const selectedCamera = devices[currentCameraIndex] || devices[0];
+        console.log("🎯 Kamera aktif:", selectedCamera.label || selectedCamera.id);
 
         return scanner.start(
-          { deviceId: { exact: selectedCameraId } },
+          { deviceId: { exact: selectedCamera.id } },
           { fps: 10, qrbox: { width: 300, height: 350 } },
           (decodedText) => {
             const now = Date.now();
@@ -122,7 +115,7 @@ export default function QRScanner({ attendees, setAttendees }) {
       })
       .then(() => setIsCameraOn(true))
       .catch((err) => {
-        console.error("Gagal mulai kamera:", err);
+        console.error("❌ Gagal start kamera:", err);
         setError("Gagal menginisialisasi kamera.");
       });
   };
@@ -180,15 +173,15 @@ export default function QRScanner({ attendees, setAttendees }) {
                 {cameraList.length > 1 && (
                   <button
                     onClick={() => {
-                      const nextFacing = cameraFacing === "user" ? "environment" : "user";
-                      console.log("🔁 Berpindah ke kamera:", nextFacing);
-                      setCameraFacing(nextFacing);
+                      const nextIndex = (currentCameraIndex + 1) % cameraList.length;
+                      console.log("🔁 Ganti ke kamera:", cameraList[nextIndex]?.label);
                       stopScanner();
+                      setCurrentCameraIndex(nextIndex);
                       setTimeout(() => startScanner(), 500);
                     }}
                     className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
                   >
-                    🔁 Ganti ke Kamera {cameraFacing === "user" ? "Belakang" : "Depan"}
+                    🔁 Ganti Kamera
                   </button>
                 )}
               </>
