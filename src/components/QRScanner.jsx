@@ -8,10 +8,12 @@ export default function QRScanner() {
   const [successMessage, setSuccessMessage] = useState(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cameraList, setCameraList] = useState([]);
 
   const scannerRef = useRef(null);
   const containerRef = useRef(null);
   const lastScanTimeRef = useRef(0);
+  const cameraIndexRef = useRef(0); // 💡 Ref bukan state
   const navigate = useNavigate();
 
   const processQRData = async (decodedText) => {
@@ -78,29 +80,20 @@ export default function QRScanner() {
     setIsProcessing(false);
   };
 
-  const startCameraByFacingMode = async (facing = "user") => {
+  const startScanner = async () => {
+    if (!containerRef.current) return;
+
     try {
       const devices = await Html5Qrcode.getCameras();
-      const target = devices.find((d) =>
-        d.label.toLowerCase().includes(facing === "user" ? "front" : "back")
-      );
+      if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
+      setCameraList(devices);
 
-      if (!target) {
-        setError(`Kamera ${facing === "user" ? "depan" : "belakang"} tidak ditemukan.`);
-        return;
-      }
-
-      if (scannerRef.current) {
-        await scannerRef.current.stop();
-        await scannerRef.current.clear();
-        scannerRef.current = null;
-      }
-
+      const selectedCamera = devices[cameraIndexRef.current] || devices[0];
       const scanner = new Html5Qrcode(containerRef.current.id);
       scannerRef.current = scanner;
 
       await scanner.start(
-        { deviceId: { exact: target.id } },
+        { deviceId: { exact: selectedCamera.id } },
         { fps: 10, qrbox: { width: 300, height: 350 } },
         (decodedText) => {
           const now = Date.now();
@@ -131,6 +124,39 @@ export default function QRScanner() {
     }
   };
 
+  const switchCamera = async () => {
+    try {
+      const nextIndex = (cameraIndexRef.current + 1) % cameraList.length;
+      const selectedCamera = cameraList[nextIndex];
+
+      if (scannerRef.current) {
+        await scannerRef.current.stop();
+        await scannerRef.current.clear();
+        scannerRef.current = null;
+      }
+
+      const newScanner = new Html5Qrcode(containerRef.current.id);
+      scannerRef.current = newScanner;
+
+      await newScanner.start(
+        { deviceId: { exact: selectedCamera.id } },
+        { fps: 10, qrbox: { width: 300, height: 350 } },
+        (decodedText) => {
+          const now = Date.now();
+          if (now - lastScanTimeRef.current < 1000) return;
+          lastScanTimeRef.current = now;
+          processQRData(decodedText);
+        }
+      );
+
+      cameraIndexRef.current = nextIndex;
+      setIsCameraOn(true);
+    } catch (err) {
+      console.error("❌ Gagal ganti kamera:", err);
+      setError("Gagal ganti kamera.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-tr from-pink-100 to-white p-6">
       <div className="max-w-xl mx-auto space-y-6">
@@ -151,7 +177,7 @@ export default function QRScanner() {
           <div className="flex justify-center gap-3 mb-4 flex-wrap">
             {!isCameraOn ? (
               <button
-                onClick={() => startCameraByFacingMode("user")}
+                onClick={startScanner}
                 className="px-6 py-3 bg-rose-600 text-white rounded-lg shadow-md hover:bg-rose-700 transition-all"
               >
                 🎥 Nyalakan Kamera
@@ -159,23 +185,20 @@ export default function QRScanner() {
             ) : (
               <>
                 <button
-                  onClick={() => startCameraByFacingMode("environment")}
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition-all"
-                >
-                  📷 Gunakan Kamera Belakang
-                </button>
-                <button
-                  onClick={() => startCameraByFacingMode("user")}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-all"
-                >
-                  🎥 Gunakan Kamera Depan
-                </button>
-                <button
                   onClick={stopScanner}
                   className="px-6 py-3 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-all"
                 >
                   ❌ Matikan Kamera
                 </button>
+
+                {cameraList.length > 1 && (
+                  <button
+                    onClick={switchCamera}
+                    className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
+                  >
+                    🔁 Ganti Kamera
+                  </button>
+                )}
               </>
             )}
 
