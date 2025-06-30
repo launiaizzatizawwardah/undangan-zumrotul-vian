@@ -14,7 +14,6 @@ export default function QRScanner() {
   const scannerRef = useRef(null);
   const containerRef = useRef(null);
   const lastScanTimeRef = useRef(0);
-  const beepRef = useRef(null);
   const navigate = useNavigate();
 
   const processQRData = async (decodedText) => {
@@ -76,7 +75,6 @@ export default function QRScanner() {
       return;
     }
 
-    if (beepRef.current) beepRef.current.play();
     setSuccessMessage("✅ Scan berhasil!");
     setTimeout(() => setSuccessMessage(null), 3000);
     setIsProcessing(false);
@@ -85,15 +83,15 @@ export default function QRScanner() {
   const startScanner = async () => {
     if (!containerRef.current) return;
 
-    const scanner = new Html5Qrcode(containerRef.current.id);
-    scannerRef.current = scanner;
-
     try {
       const devices = await Html5Qrcode.getCameras();
       if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
       setCameraList(devices);
 
-      const selectedCamera = devices[currentCameraIndex] || devices[0];
+      const selectedCamera = devices[0]; // default: kamera depan
+      const scanner = new Html5Qrcode(containerRef.current.id);
+      scannerRef.current = scanner;
+
       await scanner.start(
         { deviceId: { exact: selectedCamera.id } },
         { fps: 10, qrbox: { width: 300, height: 350 } },
@@ -104,13 +102,12 @@ export default function QRScanner() {
           processQRData(decodedText);
         },
         (err) => {
-          if (!String(err).includes("NotFoundException")) {
-            console.warn("Scan error:", err);
-          }
+          console.warn("Scan error:", err);
         }
       );
 
       setIsCameraOn(true);
+      setCurrentCameraIndex(0);
     } catch (err) {
       console.error("❌ Gagal nyalakan kamera:", err);
       setError("Gagal nyalakan kamera.");
@@ -170,15 +167,19 @@ export default function QRScanner() {
                     onClick={async () => {
                       try {
                         const nextIndex = (currentCameraIndex + 1) % cameraList.length;
-                        const nextCamera = cameraList[nextIndex];
+                        const selectedCamera = cameraList[nextIndex];
 
-                        await stopScanner();
+                        if (scannerRef.current) {
+                          await scannerRef.current.stop();
+                          await scannerRef.current.clear();
+                          scannerRef.current = null;
+                        }
 
-                        const scanner = new Html5Qrcode(containerRef.current.id);
-                        scannerRef.current = scanner;
+                        const newScanner = new Html5Qrcode(containerRef.current.id);
+                        scannerRef.current = newScanner;
 
-                        await scanner.start(
-                          { deviceId: { exact: nextCamera.id } },
+                        await newScanner.start(
+                          { deviceId: { exact: selectedCamera.id } },
                           { fps: 10, qrbox: { width: 300, height: 350 } },
                           (decodedText) => {
                             const now = Date.now();
@@ -187,9 +188,7 @@ export default function QRScanner() {
                             processQRData(decodedText);
                           },
                           (err) => {
-                            if (!String(err).includes("NotFoundException")) {
-                              console.warn("Scan error:", err);
-                            }
+                            console.warn("Scan error:", err);
                           }
                         );
 
