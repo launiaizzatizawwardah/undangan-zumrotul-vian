@@ -5,21 +5,19 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Attendance() {
   const [attendees, setAttendees] = useState([]);
+  const [qrGuests, setQrGuests] = useState([]);
+  const [manualGuests, setManualGuests] = useState([]);
+  const [vipGuests, setVipGuests] = useState([]);
+  const [regulerGuests, setRegulerGuests] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const [qrGuests, setQrGuests] = useState([]);
-  const [manualGuests, setManualGuests] = useState([]);
-
   const [currentPageQR, setCurrentPageQR] = useState(1);
   const [currentPageManual, setCurrentPageManual] = useState(1);
-
   const itemsPerPage = 5;
 
   const totalPagesQR = Math.ceil(qrGuests.length / itemsPerPage);
   const totalPagesManual = Math.ceil(manualGuests.length / itemsPerPage);
-
-  const [vipGuests, setVipGuests] = useState([]);
 
   const currentQRGuests = qrGuests.slice(
     (currentPageQR - 1) * itemsPerPage,
@@ -30,10 +28,6 @@ export default function Attendance() {
     (currentPageManual - 1) * itemsPerPage,
     currentPageManual * itemsPerPage
   );
-
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,9 +40,21 @@ export default function Attendance() {
         console.error("Gagal ambil data kehadiran:", error.message);
       } else {
         setAttendees(data);
+
         setQrGuests(data.filter((g) => g.source === "qr"));
-        setManualGuests(data.filter((g) => g.source === "manual"));
-        setVipGuests(data.filter((g) => g.source === "vip"));
+
+        setManualGuests(data.filter((g) =>
+          g.source === "manual" &&
+          (!g.category || g.category.toLowerCase() !== "reguler")
+        ));
+
+        setVipGuests(data.filter((g) =>
+          ["vip", "vvip"].includes((g.category || "").toLowerCase())
+        ));
+
+        setRegulerGuests(data.filter((g) =>
+          (g.category || "").toLowerCase() === "regular"
+        ));
       }
 
       setLoading(false);
@@ -56,6 +62,10 @@ export default function Attendance() {
 
     fetchData();
   }, []);
+
+  const scrollTo = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const downloadCSV = () => {
     const headers = ["UUID", "Nama", "Phone", "Guests", "Table", "Time"];
@@ -85,8 +95,8 @@ export default function Attendance() {
           <p className="text-center text-gray-400">⏳ Memuat data...</p>
         ) : (
           <>
-            {/* QR Section */}
-            <div id="qr-section" className="bg-white rounded-lg shadow-md p-4 mb-6">
+            {/* QR Guests */}
+            <div className="bg-white rounded-lg shadow-md p-4 mb-6">
               <h2 className="text-xl font-bold text-green-700 mb-2 font-serif">📲 Kehadiran via QR</h2>
               {qrGuests.length === 0 ? (
                 <p className="text-center text-gray-400">Belum ada tamu dari QR.</p>
@@ -102,145 +112,88 @@ export default function Attendance() {
                       className="space-y-3"
                     >
                       {currentQRGuests.map((guest) => (
-                        <li
-                          key={guest.uuid || `${guest.name}-${guest.phone}`}
-                          className="border-b pb-2"
-                        >
+                        <li key={guest.uuid || guest.name} className="border-b pb-2">
                           <p><strong>👤 {guest.name}</strong></p>
-                          <p>📱 {guest.phone} | 👥 {guest.guests} tamu</p>
+                          <p>📱 {guest.phone || "-"} | 👥 {guest.guests || 1} tamu</p>
                           <span className="font-semibold flex items-center gap-2">
-                        📍 {guest.table?.toUpperCase().includes("VVIP") ? (
-                          <span className="text-yellow-600">VVIP ⭐⭐</span>
-                        ) : guest.table?.toUpperCase().includes("VIP") ? (
-                          <span className="text-yellow-500">VIP ⭐</span>
-                        ) : (
-                          <span className="text-blue-600 font-semibold">Reguler</span> // ← Tambahan label Reguler
-                        )}
-                      </span>
+                            📍 {(guest.table || "").toUpperCase().includes("VVIP") ? (
+                              <span className="text-yellow-600">VVIP ⭐⭐</span>
+                            ) : (guest.table || "").toUpperCase().includes("VIP") ? (
+                              <span className="text-yellow-500">VIP ⭐</span>
+                            ) : (
+                              <span className="text-blue-600 font-semibold">Reguler</span>
+                            )}
+                          </span>
                           <p className="text-xs text-gray-400">UUID: {guest.uuid}</p>
                         </li>
                       ))}
                     </motion.ul>
                   </AnimatePresence>
-
-                  <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
-                    <button
-                      onClick={() => {
-                        setCurrentPageQR((p) => Math.max(p - 1, 1));
-                        scrollTo("qr-section");
-                      }}
-                      disabled={currentPageQR === 1}
-                      className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-                    >
-                      ← Sebelumnya
-                    </button>
-                    <span>
-                      Halaman <strong>{currentPageQR}</strong> dari <strong>{totalPagesQR}</strong>
-                    </span>
-                    <button
-                      onClick={() => {
-                        setCurrentPageQR((p) => Math.min(p + 1, totalPagesQR));
-                        scrollTo("qr-section");
-                      }}
-                      disabled={currentPageQR === totalPagesQR}
-                      className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-                    >
-                      Selanjutnya →
-                    </button>
-                  </div>
                 </>
               )}
             </div>
 
-            {/* Manual Section */}
-            <div id="manual-section" className="bg-white rounded-lg shadow-md p-4">
+            {/* Manual Guests */}
+            <div className="bg-white rounded-lg shadow-md p-4">
               <h2 className="text-xl font-bold text-yellow-700 mb-2 font-serif">📝 Kehadiran Manual</h2>
               {manualGuests.length === 0 ? (
                 <p className="text-center text-gray-400">Belum ada tamu manual.</p>
               ) : (
-                <>
-                  <AnimatePresence mode="wait">
-                    <motion.ul
-                      key={currentPageManual}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-3"
-                    >
-                      {currentManualGuests.map((guest) => (
-                        <li
-                          key={guest.uuid || `${guest.name}-${guest.phone}`}
-                          className="border-b pb-2"
-                        >
-                          <p><strong>👤 {guest.name}</strong></p>
-                          <p>📱 {guest.phone} | 👥 {guest.guests} tamu</p>
-                          <span className="font-semibold flex flex-col">
-                          <span>📍 {guest.table}</span>
-                          {guest.category?.toUpperCase() === "VVIP" ? (
-                            <span className="text-yellow-600">🔱 VVIP</span>
-                          ) : guest.category?.toUpperCase() === "VIP" ? (
-                            <span className="text-yellow-500">🌟 VIP</span>
-                          ) : (
-                            <span className="text-blue-600">🔰 Reguler</span>
-                          )}
-                        </span>
-                          <p className="text-xs text-gray-400">UUID: {guest.uuid}</p>
-                        </li>
-                      ))}
-                    </motion.ul>
-                  </AnimatePresence>
-
-                  <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
-                    <button
-                      onClick={() => {
-                        setCurrentPageManual((p) => Math.max(p - 1, 1));
-                        scrollTo("manual-section");
-                      }}
-                      disabled={currentPageManual === 1}
-                      className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-                    >
-                      ← Sebelumnya
-                    </button>
-                    <span>
-                      Halaman <strong>{currentPageManual}</strong> dari <strong>{totalPagesManual}</strong>
-                    </span>
-                    <button
-                      onClick={() => {
-                        setCurrentPageManual((p) => Math.min(p + 1, totalPagesManual));
-                        scrollTo("manual-section");
-                      }}
-                      disabled={currentPageManual === totalPagesManual}
-                      className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-                    >
-                      Selanjutnya →
-                    </button>
-                  </div>
-                </>
+                <ul className="space-y-3">
+                  {manualGuests.map((guest) => (
+                    <li key={guest.uuid || guest.name} className="border-b pb-2">
+                      <p><strong>👤 {guest.name}</strong></p>
+                      <p>📱 {guest.phone || "-"} | 👥 {guest.guests || 1} tamu</p>
+                      <span className="font-semibold flex flex-col">
+                        <span>📍 {guest.table || "-"}</span>
+                        {guest.category?.toUpperCase() === "VVIP" ? (
+                          <span className="text-yellow-600">🔱 VVIP</span>
+                        ) : guest.category?.toUpperCase() === "VIP" ? (
+                          <span className="text-yellow-500">🌟 VIP</span>
+                        ) : (
+                          <span className="text-blue-600">🔰 Reguler</span>
+                        )}
+                      </span>
+                      <p className="text-xs text-gray-400">UUID: {guest.uuid}</p>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
 
-            {/* VIP/VVIP Section */}
-            <div id="vip-section" className="bg-white rounded-lg shadow-md p-4 mt-6">
+            {/* Reguler Guests */}
+            <div className="bg-white rounded-lg shadow-md p-4">
+              <h2 className="text-xl font-bold text-blue-700 mb-2 font-serif">🔰 Kehadiran Reguler</h2>
+              {regulerGuests.length === 0 ? (
+                <p className="text-center text-gray-400">Belum ada tamu Reguler.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {regulerGuests.map((guest) => (
+                    <li key={guest.uuid || guest.name} className="border-b pb-2 bg-blue-50 text-blue-800 p-2 rounded">
+                      <p className="font-bold">👤 {guest.name}</p>
+                      <p className="text-sm">🔰 Kategori : Reguler</p>
+                      {/* <p className="text-sm">📱 {guest.phone || "-"}</p>
+                      <p className="text-sm">👥 {guest.guests || 1} tamu</p> */}
+                      {/* <p className="text-sm">📍 {guest.table || "-"}</p> */}
+                      <p className="text-xs text-gray-500">🕒 {new Date(guest.time).toLocaleString()}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* VIP & VVIP Guests */}
+            <div className="bg-white rounded-lg shadow-md p-4 mt-6">
               <h2 className="text-xl font-bold text-purple-700 mb-2 font-serif">🎖️ Kehadiran VIP & VVIP</h2>
               {vipGuests.length === 0 ? (
                 <p className="text-center text-gray-400">Belum ada tamu VIP/VVIP.</p>
               ) : (
                 <ul className="space-y-3">
                   {vipGuests.map((guest) => (
-                    <li
-                      key={guest.uuid || guest.name}
-                      className={`border-b pb-2 ${
-                        guest.category === "VVIP"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      } p-2 rounded`}
-                    >
+                    <li key={guest.uuid || guest.name} className={`border-b pb-2 ${guest.category === "VVIP" ? "bg-purple-100 text-purple-800" : "bg-yellow-100 text-yellow-800"} p-2 rounded`}>
                       <p className="font-bold">👤 {guest.name}</p>
                       <p className="text-sm text-gray-700">📛 {guest.status || "-"}</p>
-                      <p className="text-sm">
-                        {guest.category === "VVIP" ? "🔱 VVIP" : "🌟 VIP"}
-                      </p>
+                      <p className="text-sm">Kategori : {guest.category === "VVIP" ? "🔱 VVIP" : "🌟 VIP"}</p>
                       <p className="text-xs text-gray-500">🕒 {new Date(guest.time).toLocaleString()}</p>
                     </li>
                   ))}
@@ -250,24 +203,9 @@ export default function Attendance() {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 mt-6">
-              <button
-                onClick={downloadCSV}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                📥 Download CSV
-              </button>
-              <button
-                onClick={() => navigate("/QRScanner")}
-                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"
-              >
-                🔙 Kembali ke Scanner
-              </button>
-              <button
-                onClick={() => navigate("/attendancevip")}
-                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"
-              >
-                  👑 Kembali ke halaman VIP/VVIP
-              </button>
+              <button onClick={downloadCSV} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">📥 Download CSV</button>
+              <button onClick={() => navigate("/QRScanner")} className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900">🔙 Kembali ke Scanner</button>
+              <button onClick={() => navigate("/attendancevip")} className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900">👑 Kembali ke halaman VIP/VVIP</button>
             </div>
           </>
         )}

@@ -52,37 +52,42 @@ const handleSearch = (e) => {
   setFilteredResults(filtered);
 };
 
-  const handleCheckin = async (guest) => {
-    console.log("📥 Checkin untuk:", guest.name); // ⬅️ DEBUG 1
+ const handleCheckin = async (guest) => {
+  console.log("📥 Checkin untuk:", guest.name);
 
-    if (attendanceList.includes((guest.name || "").toLowerCase())) {
-      toast.info(`${guest.name} sudah ditandai hadir.`);
-      return;
-    }
-
-    const now = new Date().toISOString();
-    const { error } = await supabase.from("guest_attendance").insert([
-      {
-        name: guest.name,
-        category: guest.category,
-        status: guest.status,
-        time: now,
-        source: "vip",
-      },
-    ]);
-
-    if (error) {
-    toast.error("Gagal menyimpan kehadiran.");
-    console.error("❌ Insert error:", error); // ⬅️ DEBUG 2
+  if (attendanceList.includes((guest.name || "").toLowerCase())) {
+    toast.info(`${guest.name} sudah ditandai hadir.`);
     return;
   }
 
-    // 🔊 Play sound effect
-    const audio = new Audio("/sound/success.mp3");
-    audio.play();
-    toast.success(`${guest.name} berhasil ditandai hadir!`);
-    setAttendanceList((prev) => [...prev, guest.name.toLowerCase()]);
-  };
+  const now = new Date().toISOString();
+  const category = guest.category || "Reguler";
+  const source =
+    category.toLowerCase() === "vip" || category.toLowerCase() === "vvip"
+      ? "vip"
+      : ""; // ✅ Jika bukan VIP/VVIP, dianggap manual
+
+  const { error } = await supabase.from("guest_attendance").insert([
+    {
+      name: guest.name,
+      category: category,
+      status: guest.status,
+      time: now,
+      source: source,
+    },
+  ]);
+
+  if (error) {
+    toast.error("Gagal menyimpan kehadiran.");
+    console.error("❌ Insert error:", error);
+    return;
+  }
+
+  const audio = new Audio("/sound/success.mp3");
+  audio.play();
+  toast.success(`${guest.name} berhasil ditandai hadir!`);
+  setAttendanceList((prev) => [...prev, guest.name.toLowerCase()]);
+};
 
   return (
     <div className="min-h-screen bg-white p-6 max-w-3xl mx-auto">
@@ -112,18 +117,24 @@ const handleSearch = (e) => {
         <ul className="space-y-4">
           {filteredResults.map((guest) => (
             <li
-              key={guest.name}
-              className={`p-4 border rounded-lg shadow-sm animate-fadeIn ${
-                guest.category === "VVIP"
-                  ? "bg-purple-100 text-purple-800 border-purple-300"
-                  : "bg-green-100 text-yellow-800 border-green-300"
-              }`}
-            >
-              <p className="font-bold text-lg">👤 {guest.name}</p>
-              <p className="text-sm text-gray-600">📛 {guest.status || "-"}</p>
-              <p className="text-sm text-gray-600">
-                 {guest.category === "VVIP" ? "🔱 Kategori: VVIP" : "🌟 Kategori: VIP"}
-              </p>
+            key={guest.name}
+            className={`p-4 border rounded-lg shadow-sm animate-fadeIn ${
+              guest.category === "VVIP"
+                ? "bg-purple-100 text-purple-800 border-purple-300"
+                : guest.category === "VIP"
+                ? "bg-green-100 text-yellow-800 border-green-300"
+                : "bg-yellow-100 text-yellow-800 border-yellow-300" // Tambahkan untuk Reguler
+            }`}
+          >
+               <p className="font-bold text-lg">👤 {guest.name}</p>
+                <p className="text-sm text-gray-600">📛 {guest.status || "-"}</p>
+                <p className="text-sm text-gray-600">
+                  {guest.category === "VVIP"
+                    ? "🔱 Kategori: VVIP"
+                    : guest.category === "VIP"
+                    ? "🌟 Kategori: VIP"
+                    : "👥 Kategori: Reguler"}
+                </p>
               {attendanceList.includes(guest.name.toLowerCase()) ? (
                 <p className="text-green-600 font-semibold mt-2">✅ Sudah Hadir</p>
               ) : (
