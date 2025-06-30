@@ -90,13 +90,10 @@ export default function QRScanner() {
 
     Html5Qrcode.getCameras()
       .then((devices) => {
-        console.log("📸 Kamera tersedia:", devices);
         if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
         setCameraList(devices);
 
         const selectedCamera = devices[currentCameraIndex] || devices[0];
-        console.log("🎯 Memulai kamera:", selectedCamera.label || selectedCamera.id);
-
         return scanner.start(
           { deviceId: { exact: selectedCamera.id } },
           { fps: 10, qrbox: { width: 300, height: 350 } },
@@ -172,17 +169,17 @@ export default function QRScanner() {
 
                 {cameraList.length > 1 && (
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       const nextIndex = (currentCameraIndex + 1) % cameraList.length;
                       const selectedCamera = cameraList[nextIndex];
-                      console.log("🔁 Berpindah ke kamera:", selectedCamera.label || selectedCamera.id);
                       stopScanner();
-                      setTimeout(() => {
-                        setCurrentCameraIndex(nextIndex);
-                        const scanner = new Html5Qrcode(containerRef.current.id);
-                        scannerRef.current = scanner;
-                        scanner
-                          .start(
+
+                      setTimeout(async () => {
+                        try {
+                          const scanner = new Html5Qrcode(containerRef.current.id);
+                          scannerRef.current = scanner;
+
+                          await scanner.start(
                             { deviceId: { exact: selectedCamera.id } },
                             { fps: 10, qrbox: { width: 300, height: 350 } },
                             (decodedText) => {
@@ -196,12 +193,14 @@ export default function QRScanner() {
                                 console.warn("Scan error:", err);
                               }
                             }
-                          )
-                          .then(() => setIsCameraOn(true))
-                          .catch((err) => {
-                            console.error("❌ Gagal ganti kamera:", err);
-                            setError("Gagal ganti kamera.");
-                          });
+                          );
+
+                          setCurrentCameraIndex(nextIndex);
+                          setIsCameraOn(true);
+                        } catch (err) {
+                          console.error("❌ Gagal ganti kamera:", err);
+                          setError("Gagal ganti kamera.");
+                        }
                       }, 500);
                     }}
                     className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
