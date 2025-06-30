@@ -9,7 +9,7 @@ export default function QRScanner({ attendees, setAttendees }) {
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cameraList, setCameraList] = useState([]);
-  const [cameraFacing, setCameraFacing] = useState("environment"); // 'user' atau 'environment'
+  const [cameraFacing, setCameraFacing] = useState("user"); // 👈 default: kamera depan
 
   const scannerRef = useRef(null);
   const containerRef = useRef(null);
@@ -90,7 +90,7 @@ export default function QRScanner({ attendees, setAttendees }) {
 
     Html5Qrcode.getCameras()
       .then((devices) => {
-        console.log("📸 Daftar kamera:", devices); // Debug log
+        console.log("📸 Daftar kamera:", devices);
         if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
         setCameraList(devices);
 
@@ -107,11 +107,10 @@ export default function QRScanner({ attendees, setAttendees }) {
             )?.id ||
             (cameraFacing === "user"
               ? devices[0].id
-              : devices[1]?.id || devices[0].id); // fallback by index
+              : devices[1]?.id || devices[0].id);
         }
 
-        console.log("🎯 Kamera dipilih (facing:", cameraFacing, "):", selectedCameraId);
-
+        console.log("🎯 Kamera dipilih:", selectedCameraId);
         return scanner.start(
           { deviceId: { exact: selectedCameraId } },
           { fps: 10, qrbox: { width: 300, height: 350 } },
