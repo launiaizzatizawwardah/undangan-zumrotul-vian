@@ -185,21 +185,19 @@ export default function QRScanner({ attendees, setAttendees }) {
                 </button>
 
                 {cameraList.length > 1 && (
-                  <button
-                    onClick={() => {
-                      const nextFacing =
-                        cameraFacing === "user" ? "environment" : "user";
-                      console.log("🔁 Berpindah ke kamera:", nextFacing);
-                      setCameraFacing(nextFacing);
-                      stopScanner();
-                      setTimeout(() => startScanner(), 500);
-                    }}
-                    className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
-                  >
-                    🔁 Ganti ke Kamera{" "}
-                    {cameraFacing === "user" ? "Belakang" : "Depan"}
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    const nextFacing = cameraFacing === "user" ? "environment" : "user";
+                    console.log("🔁 Berpindah ke kamera:", nextFacing);
+                    setCameraFacing(nextFacing);
+                    stopScanner();
+                    setTimeout(() => startScanner(), 500);
+                  }}
+                  className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
+                >
+                  🔁 Ganti ke Kamera {cameraFacing === "user" ? "Belakang" : "Depan"}
+                </button>
+              )}
               </>
             )}
 
