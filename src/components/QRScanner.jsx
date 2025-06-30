@@ -9,7 +9,7 @@ export default function QRScanner() {
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cameraList, setCameraList] = useState([]);
-  const [currentCameraIndex, setCurrentCameraIndex] = useState(0); // ✅ Kamera index aktif
+  const [currentCameraIndex, setCurrentCameraIndex] = useState(0);
 
   const scannerRef = useRef(null);
   const containerRef = useRef(null);
@@ -90,12 +90,12 @@ export default function QRScanner() {
 
     Html5Qrcode.getCameras()
       .then((devices) => {
-        console.log("📸 Semua kamera:", devices);
+        console.log("📸 Kamera tersedia:", devices);
         if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
         setCameraList(devices);
 
         const selectedCamera = devices[currentCameraIndex] || devices[0];
-        console.log("🎯 Kamera aktif:", selectedCamera.label || selectedCamera.id);
+        console.log("🎯 Memulai kamera:", selectedCamera.label || selectedCamera.id);
 
         return scanner.start(
           { deviceId: { exact: selectedCamera.id } },
@@ -174,10 +174,35 @@ export default function QRScanner() {
                   <button
                     onClick={() => {
                       const nextIndex = (currentCameraIndex + 1) % cameraList.length;
-                      console.log("🔁 Ganti ke kamera:", cameraList[nextIndex]?.label);
+                      const selectedCamera = cameraList[nextIndex];
+                      console.log("🔁 Berpindah ke kamera:", selectedCamera.label || selectedCamera.id);
                       stopScanner();
-                      setCurrentCameraIndex(nextIndex);
-                      setTimeout(() => startScanner(), 500);
+                      setTimeout(() => {
+                        setCurrentCameraIndex(nextIndex);
+                        const scanner = new Html5Qrcode(containerRef.current.id);
+                        scannerRef.current = scanner;
+                        scanner
+                          .start(
+                            { deviceId: { exact: selectedCamera.id } },
+                            { fps: 10, qrbox: { width: 300, height: 350 } },
+                            (decodedText) => {
+                              const now = Date.now();
+                              if (now - lastScanTimeRef.current < 1000) return;
+                              lastScanTimeRef.current = now;
+                              processQRData(decodedText);
+                            },
+                            (err) => {
+                              if (!String(err).includes("NotFoundException")) {
+                                console.warn("Scan error:", err);
+                              }
+                            }
+                          )
+                          .then(() => setIsCameraOn(true))
+                          .catch((err) => {
+                            console.error("❌ Gagal ganti kamera:", err);
+                            setError("Gagal ganti kamera.");
+                          });
+                      }, 500);
                     }}
                     className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
                   >
