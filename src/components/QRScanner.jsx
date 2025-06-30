@@ -9,11 +9,11 @@ export default function QRScanner() {
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cameraList, setCameraList] = useState([]);
-  const [currentCameraIndex, setCurrentCameraIndex] = useState(0);
 
   const scannerRef = useRef(null);
   const containerRef = useRef(null);
   const lastScanTimeRef = useRef(0);
+  const cameraIndexRef = useRef(0); // 💡 Ref bukan state
   const navigate = useNavigate();
 
   const processQRData = async (decodedText) => {
@@ -88,7 +88,7 @@ export default function QRScanner() {
       if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
       setCameraList(devices);
 
-      const selectedCamera = devices[0]; // default: kamera depan
+      const selectedCamera = devices[cameraIndexRef.current] || devices[0];
       const scanner = new Html5Qrcode(containerRef.current.id);
       scannerRef.current = scanner;
 
@@ -100,14 +100,10 @@ export default function QRScanner() {
           if (now - lastScanTimeRef.current < 1000) return;
           lastScanTimeRef.current = now;
           processQRData(decodedText);
-        },
-        (err) => {
-          console.warn("Scan error:", err);
         }
       );
 
       setIsCameraOn(true);
-      setCurrentCameraIndex(0);
     } catch (err) {
       console.error("❌ Gagal nyalakan kamera:", err);
       setError("Gagal nyalakan kamera.");
@@ -128,6 +124,39 @@ export default function QRScanner() {
     }
   };
 
+  const switchCamera = async () => {
+    try {
+      const nextIndex = (cameraIndexRef.current + 1) % cameraList.length;
+      const selectedCamera = cameraList[nextIndex];
+
+      if (scannerRef.current) {
+        await scannerRef.current.stop();
+        await scannerRef.current.clear();
+        scannerRef.current = null;
+      }
+
+      const newScanner = new Html5Qrcode(containerRef.current.id);
+      scannerRef.current = newScanner;
+
+      await newScanner.start(
+        { deviceId: { exact: selectedCamera.id } },
+        { fps: 10, qrbox: { width: 300, height: 350 } },
+        (decodedText) => {
+          const now = Date.now();
+          if (now - lastScanTimeRef.current < 1000) return;
+          lastScanTimeRef.current = now;
+          processQRData(decodedText);
+        }
+      );
+
+      cameraIndexRef.current = nextIndex;
+      setIsCameraOn(true);
+    } catch (err) {
+      console.error("❌ Gagal ganti kamera:", err);
+      setError("Gagal ganti kamera.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-tr from-pink-100 to-white p-6">
       <div className="max-w-xl mx-auto space-y-6">
@@ -138,7 +167,7 @@ export default function QRScanner() {
           Selamat datang di acara pernikahan, silakan scan tiket Anda 🎉
         </p>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 relative border border-pink-200">
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-pink-200">
           {successMessage && (
             <div className="bg-green-500 text-white p-2 rounded text-center mb-4 shadow">
               {successMessage}
@@ -164,41 +193,7 @@ export default function QRScanner() {
 
                 {cameraList.length > 1 && (
                   <button
-                    onClick={async () => {
-                      try {
-                        const nextIndex = (currentCameraIndex + 1) % cameraList.length;
-                        const selectedCamera = cameraList[nextIndex];
-
-                        if (scannerRef.current) {
-                          await scannerRef.current.stop();
-                          await scannerRef.current.clear();
-                          scannerRef.current = null;
-                        }
-
-                        const newScanner = new Html5Qrcode(containerRef.current.id);
-                        scannerRef.current = newScanner;
-
-                        await newScanner.start(
-                          { deviceId: { exact: selectedCamera.id } },
-                          { fps: 10, qrbox: { width: 300, height: 350 } },
-                          (decodedText) => {
-                            const now = Date.now();
-                            if (now - lastScanTimeRef.current < 1000) return;
-                            lastScanTimeRef.current = now;
-                            processQRData(decodedText);
-                          },
-                          (err) => {
-                            console.warn("Scan error:", err);
-                          }
-                        );
-
-                        setCurrentCameraIndex(nextIndex);
-                        setIsCameraOn(true);
-                      } catch (err) {
-                        console.error("❌ Gagal ganti kamera:", err);
-                        setError("Gagal ganti kamera.");
-                      }
-                    }}
+                    onClick={switchCamera}
                     className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
                   >
                     🔁 Ganti Kamera
