@@ -17,68 +17,73 @@ export default function QRScanner() {
   const navigate = useNavigate();
 
   const processQRData = async (decodedText) => {
-    if (isProcessing) return;
-    setIsProcessing(true);
+  if (isProcessing) return;
+  setIsProcessing(true);
 
-    let parsed;
-    try {
-      parsed = JSON.parse(decodedText);
-    } catch {
-      setError("❌ QR tidak valid!");
-      setIsProcessing(false);
-      return;
-    }
-
-    const { uuid, name = "", phone = "", guests = 0, table = "" } = parsed;
-    if (!uuid) {
-      setError("❌ Data QR tidak lengkap.");
-      setIsProcessing(false);
-      return;
-    }
-
-    const { data: existing, error: checkError } = await supabase
-      .from("guest_attendance")
-      .select("uuid")
-      .eq("uuid", uuid)
-      .single();
-
-    if (checkError && checkError.code !== "PGRST116") {
-      setError("❌ Gagal cek database.");
-      setIsProcessing(false);
-      return;
-    }
-
-    if (existing) {
-      setError("⚠️ QR sudah pernah digunakan.");
-      setTimeout(() => setError(null), 4000);
-      setIsProcessing(false);
-      return;
-    }
-
-    const newGuest = {
-      uuid,
-      name,
-      phone,
-      guests,
-      table,
-      time: new Date().toLocaleString(),
-      source: "qr",
-    };
-
-    const { error: insertError } = await supabase
-      .from("guest_attendance")
-      .insert([newGuest]);
-
-    if (insertError) {
-      setError("❌ Gagal simpan ke database.");
-      setIsProcessing(false);
-      return;
-    }
-
-    setSuccessMessage("✅ Scan berhasil!");
-    setTimeout(() => setSuccessMessage(null), 3000);
+  let parsed;
+  try {
+    parsed = JSON.parse(decodedText);
+  } catch {
+    setError("❌ QR tidak valid!");
     setIsProcessing(false);
+    return;
+  }
+
+  const { uuid, name = "", phone = "", guests = 0, table = "" } = parsed;
+  if (!uuid) {
+    setError("❌ Data QR tidak lengkap.");
+    setIsProcessing(false);
+    return;
+  }
+
+  const { data: existing, error: checkError } = await supabase
+    .from("guest_attendance")
+    .select("uuid")
+    .eq("uuid", uuid)
+    .single();
+
+  if (checkError && checkError.code !== "PGRST116") {
+    setError("❌ Gagal cek database.");
+    setIsProcessing(false);
+    return;
+  }
+
+  if (existing) {
+    setError("⚠️ QR sudah pernah digunakan.");
+    setTimeout(() => {
+      setError(null);
+      setIsProcessing(false);
+    }, 2500); // ⏳ Delay supaya tidak langsung scan ulang
+    return;
+  }
+
+  const newGuest = {
+    uuid,
+    name,
+    phone,
+    guests,
+    table,
+    time: new Date().toLocaleString(),
+    source: "qr",
   };
+
+  const { error: insertError } = await supabase
+    .from("guest_attendance")
+    .insert([newGuest]);
+
+  if (insertError) {
+    setError("❌ Gagal simpan ke database.");
+    setIsProcessing(false);
+    return;
+  }
+
+  setSuccessMessage("✅ Scan berhasil!");
+  setTimeout(() => {
+    setSuccessMessage(null);
+    setIsProcessing(false);
+  }, 2500); // ⏳ Delay agar tidak bentrok saat scan cepat
+};
+
 
   const startScanner = async () => {
     if (!containerRef.current) return;
