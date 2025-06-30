@@ -168,17 +168,17 @@ export default function QRScanner() {
                 {cameraList.length > 1 && (
                   <button
                     onClick={async () => {
-                      const nextIndex = (currentCameraIndex + 1) % cameraList.length;
-                      const selectedCamera = cameraList[nextIndex];
-
                       try {
+                        const nextIndex = (currentCameraIndex + 1) % cameraList.length;
+                        const nextCamera = cameraList[nextIndex];
+
                         await stopScanner();
 
                         const scanner = new Html5Qrcode(containerRef.current.id);
                         scannerRef.current = scanner;
 
                         await scanner.start(
-                          { deviceId: { exact: selectedCamera.id } },
+                          { deviceId: { exact: nextCamera.id } },
                           { fps: 10, qrbox: { width: 300, height: 350 } },
                           (decodedText) => {
                             const now = Date.now();
