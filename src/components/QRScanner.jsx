@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
@@ -9,7 +9,7 @@ export default function QRScanner({ attendees, setAttendees }) {
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cameraList, setCameraList] = useState([]);
-  const [cameraFacing, setCameraFacing] = useState("user"); // 👈 default: kamera depan
+  const [cameraFacing, setCameraFacing] = useState("user"); // ✅ default: kamera depan
 
   const scannerRef = useRef(null);
   const containerRef = useRef(null);
@@ -94,23 +94,16 @@ export default function QRScanner({ attendees, setAttendees }) {
         if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
         setCameraList(devices);
 
+        // ✅ Pilih berdasarkan index, bukan label
         let selectedCameraId;
-        if (devices.length === 1) {
-          selectedCameraId = devices[0].id;
+        if (cameraFacing === "user") {
+          selectedCameraId = devices[0]?.id; // kamera depan
         } else {
-          selectedCameraId =
-            devices.find((device) =>
-              cameraFacing === "user"
-                ? device.label.toLowerCase().includes("front")
-                : device.label.toLowerCase().includes("back") ||
-                  device.label.toLowerCase().includes("rear")
-            )?.id ||
-            (cameraFacing === "user"
-              ? devices[0].id
-              : devices[1]?.id || devices[0].id);
+          selectedCameraId = devices[1]?.id || devices[0]?.id; // kamera belakang
         }
 
-        console.log("🎯 Kamera dipilih:", selectedCameraId);
+        console.log("🎯 Kamera dipilih:", selectedCameraId, "👉 facing:", cameraFacing);
+
         return scanner.start(
           { deviceId: { exact: selectedCameraId } },
           { fps: 10, qrbox: { width: 300, height: 350 } },
@@ -185,19 +178,19 @@ export default function QRScanner({ attendees, setAttendees }) {
                 </button>
 
                 {cameraList.length > 1 && (
-                <button
-                  onClick={() => {
-                    const nextFacing = cameraFacing === "user" ? "environment" : "user";
-                    console.log("🔁 Berpindah ke kamera:", nextFacing);
-                    setCameraFacing(nextFacing);
-                    stopScanner();
-                    setTimeout(() => startScanner(), 500);
-                  }}
-                  className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
-                >
-                  🔁 Ganti ke Kamera {cameraFacing === "user" ? "Belakang" : "Depan"}
-                </button>
-              )}
+                  <button
+                    onClick={() => {
+                      const nextFacing = cameraFacing === "user" ? "environment" : "user";
+                      console.log("🔁 Berpindah ke kamera:", nextFacing);
+                      setCameraFacing(nextFacing);
+                      stopScanner();
+                      setTimeout(() => startScanner(), 500);
+                    }}
+                    className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
+                  >
+                    🔁 Ganti ke Kamera {cameraFacing === "user" ? "Belakang" : "Depan"}
+                  </button>
+                )}
               </>
             )}
 
