@@ -88,7 +88,7 @@ const handleSearch = (e) => {
     <div className="min-h-screen bg-white p-6 max-w-3xl mx-auto">
         <ToastContainer /> 
       <h1 className="text-2xl font-bold text-center text-green-700 mb-4">
-        🔍 Cek Kehadiran VIP / VVIP
+        🔍 Cek Kehadiran
       </h1>
 
        <button

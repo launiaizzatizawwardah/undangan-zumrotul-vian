@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 
 
-export default function QRScanner({ attendees, setAttendees }) {
+
+export default function QRScanner({ attendees, setAttendees }) { 
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
@@ -14,6 +15,8 @@ export default function QRScanner({ attendees, setAttendees }) {
   const beepRef = useRef(null);
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cameraFacing, setCameraFacing] = useState("environment"); // "user" atau "environment"
+  const [cameraList, setCameraList] = useState([]);
 
       // komponen untuk fetch data dari Supabase
       const processQRData = async (decodedText) => {
@@ -82,36 +85,51 @@ export default function QRScanner({ attendees, setAttendees }) {
 
       // 🔄 Start scanner saat komponen mount
       const startScanner = () => {
-        if (!containerRef.current) return;
+  if (!containerRef.current) return;
 
-        const scanner = new Html5Qrcode(containerRef.current.id);
-        scannerRef.current = scanner;
+  const scanner = new Html5Qrcode(containerRef.current.id);
+  scannerRef.current = scanner;
 
-        Html5Qrcode.getCameras()
-          .then((devices) => {
-            if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
-            return scanner.start(
-              devices[0].id,
-              { fps: 10, qrbox: { width: 300, height: 350 } },
-              (decodedText) => {
-                const now = Date.now();
-                if (now - lastScanTimeRef.current < 1000) return;
-                lastScanTimeRef.current = now;
-                processQRData(decodedText);
-              },
-              (err) => {
-                if (!String(err).includes("NotFoundException")) {
-                  console.warn("Scan error:", err);
-                }
-              }
-            );
-          })
-          .then(() => setIsCameraOn(true))
-          .catch((err) => {
-            console.error("Gagal mulai kamera:", err);
-            setError("Gagal menginisialisasi kamera.");
-          });
-      };
+  Html5Qrcode.getCameras()
+    .then((devices) => {
+      if (!devices.length) throw new Error("Tidak ada kamera ditemukan.");
+      setCameraList(devices);
+
+      // Pilih kamera berdasarkan 'user' atau 'environment'
+      let selectedCamera;
+      if (devices.length === 1) {
+        selectedCamera = devices[0].id;
+      } else {
+        selectedCamera = devices.find((device) =>
+          cameraFacing === "user"
+            ? device.label.toLowerCase().includes("front")
+            : device.label.toLowerCase().includes("back") ||
+              device.label.toLowerCase().includes("rear")
+        )?.id || devices[0].id;
+      }
+
+      return scanner.start(
+        { deviceId: { exact: selectedCamera } },
+        { fps: 10, qrbox: { width: 300, height: 350 } },
+        (decodedText) => {
+          const now = Date.now();
+          if (now - lastScanTimeRef.current < 1000) return;
+          lastScanTimeRef.current = now;
+          processQRData(decodedText);
+        },
+        (err) => {
+          if (!String(err).includes("NotFoundException")) {
+            console.warn("Scan error:", err);
+          }
+        }
+      );
+    })
+    .then(() => setIsCameraOn(true))
+    .catch((err) => {
+      console.error("Gagal mulai kamera:", err);
+      setError("Gagal menginisialisasi kamera.");
+    });
+};
 
       // 🔄 Stop scanner saat komponen unmount
       const stopScanner = () => {
@@ -167,21 +185,38 @@ export default function QRScanner({ attendees, setAttendees }) {
             )}
 
           <div className="flex justify-center gap-3 mb-4 flex-wrap">
-            {!isCameraOn ? (
-              <button
-                onClick={startScanner}
-                className="px-6 py-3 bg-rose-600 text-white rounded-lg shadow-md hover:bg-rose-700 transition-all"
-              >
-                🎥 Nyalakan Kamera
-              </button>
-            ) : (
-              <button
-                onClick={stopScanner}
-                className="px-6 py-3 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-all"
-              >
-                ❌ Matikan Kamera
-              </button>
-            )}
+        {!isCameraOn ? (
+          <button
+            onClick={startScanner}
+            className="px-6 py-3 bg-rose-600 text-white rounded-lg shadow-md hover:bg-rose-700 transition-all"
+          >
+            🎥 Nyalakan Kamera
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={stopScanner}
+              className="px-6 py-3 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-all"
+            >
+              ❌ Matikan Kamera
+            </button>
+
+            {isCameraOn && cameraList.length > 1 && (
+        <button
+          onClick={() => {
+            const nextFacing = cameraFacing === "user" ? "environment" : "user";
+            setCameraFacing(nextFacing);
+            stopScanner();
+            setTimeout(() => startScanner(), 500);
+          }}
+          className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition-all"
+        >
+          🔁 Ganti ke Kamera {cameraFacing === "user" ? "Belakang" : "Depan"}
+        </button>
+      )}
+    </>
+  )}
+
 
             <button
               onClick={() => navigate("/attendance")}
