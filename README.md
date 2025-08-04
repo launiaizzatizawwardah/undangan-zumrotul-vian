@@ -13,7 +13,10 @@
 
 
 to clone project :
-input the code editor "clone "your repo""
+input the code editor "clone "your repo"
+
+step by step :
+1. install react with node modules "npm install"
 
 to running client side server 
 input the code editor for terminal "npm run dev"
