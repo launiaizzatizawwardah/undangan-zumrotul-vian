@@ -750,7 +750,7 @@ useEffect(() => {
         },
         {
           title: "Episode 4: The End of Beginning",
-          image: "/e4.jpg",
+          image: "/biru1.jpg",
           description:
             "Percayalah, bukan karna bertemu lalu berjodoh tapi karna berjodohlah kami dipertemukan, kami memutuskan untuk mengikrarkan janji suci pernikahan kami di bulan ini inshalloh sebagaimana yang pernah dikatakan oleh sayidina ali bin abi thalib 'apa yang menjadi takdirmu akan menemukan jalannya untuk menemukanmu'...",
           badge: "Eps 4",
@@ -854,7 +854,7 @@ useEffect(() => {
         { img: '/8.png', badge: 'Top 5', badgeColor: 'bg-red-500' },
         { img: '/9.png', badge: 'Top 3', badgeColor: 'bg-red-700' },
         { img: '/10.png', badge: 'Top 2', badgeColor: 'bg-pink-700' },
-        { img: '/WhenLifeGivesYouTangerines.png', badge: 'Top 1', badgeColor: 'bg-pink-500' },
+        { img: '/2.png', badge: 'Top 1', badgeColor: 'bg-pink-500' },
       ].map((item, idx) => (
         <motion.div
           key={idx}
