@@ -26,6 +26,22 @@ function CopyRekening({ number }) {
   );
 }
 
+const handleSubmitWish = async () => {
+  const { data, error } = await supabase.from("wishes").insert([
+    { name: guestName, message: wishInput }
+  ]);
+
+  if (error) {
+    console.error("❌ Gagal kirim ucapan:", error);
+    alert("Error: " + error.message);
+  } else {
+    console.log("✅ Ucapan berhasil:", data);
+    setGuestName("");
+    setWishInput("");
+    fetchWishes();
+  }
+};
+
 
 export default function WeddingInvitation() {
   const [showIntro, setShowIntro] = useState(true);
@@ -294,7 +310,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans overflow-x-hidden relative scroll-smooth">
-      <audio ref={audioRefMain} src="/sound/backsound.mp3" preload="auto" />
+      <audio ref={audioRefMain} src="/sound/adera.mp3" preload="auto" />
       <AnimatePresence>
       {phase === 'profile' && (
         <motion.section
@@ -356,7 +372,7 @@ useEffect(() => {
 )}
   {/* Gambar sebagai latar belakang fullscreen */}
   <img
-    src="/dito2.jpg" // ← ganti dengan gambar kamu
+    src="/background.jpg" // ← ganti dengan gambar kamu
     alt="Poster Prewed"
     className="absolute inset-0 w-full h-full object-cover object-top z-0"
   />
@@ -426,7 +442,7 @@ useEffect(() => {
   {/* Background Parallax */}
   <div
     className="absolute inset-0 bg-fixed bg-center bg-cover z-0"
-    style={{ backgroundImage: "url('/prewed2.jpg')" }}
+    style={{ backgroundImage: "url('/background.jpg')" }}
   >
     <div className="w-full h-full bg-black/80"></div> {/* Overlay */}
   </div>
@@ -447,7 +463,7 @@ useEffect(() => {
       transition={{ duration: 1, delay: 0.2 }}
     >
       <img
-        src="/prewed2.jpg"
+        src="/background.jpg"
         alt="Poster"
         className="w-full h-auto object-cover ease-in-out duration-300 hover:scale-105 rounded-lg shadow-lg"
       />
@@ -461,7 +477,7 @@ useEffect(() => {
       transition={{ duration: 1, delay: 0.4 }}
     >
       <p className="uppercase text-red-500 text-sm font-semibold tracking-wide">Documenter</p>
-      <h2 className="text-3xl md:text-4xl font-extrabold leading-snug">Dhito & Dini: Sebelum Hari H</h2>
+      <h2 className="text-3xl md:text-4xl font-extrabold leading-snug">Vian & Asha: Sebelum Hari H</h2>
 
       <div className="flex items-center gap-4 text-sm text-white/80">
         <span className="text-green-400 font-semibold">100% Match</span>
@@ -471,7 +487,7 @@ useEffect(() => {
       </div>
 
       <div className="bg-red-600 text-white w-fit px-4 py-1 rounded-full text-sm font-semibold shadow-md">
-        Coming soon on Sunday, 06 July 2025
+        Coming soon on 09 Oktober 2025
       </div>
 
       <p className="text-sm md:text-base text-white/80">
@@ -508,7 +524,7 @@ useEffect(() => {
       transition={{ duration: 0.8 }}
     >
       <img
-        src="/prewed3.jpg"
+        src="/biru1.jpg"
         alt="Pengumuman"
         className="w-full h-full object-cover ease-in-out duration-300 hover:scale-105"
       />
@@ -558,7 +574,7 @@ useEffect(() => {
         viewport={{ once: false }}
       >
         <img
-          src="/dini1.jpg"
+          src="/rotul.jpg"
           alt="Alya Fadilah M.R"
           className="w-48 h-48 object-cover rounded-xl shadow-lg"
         />
@@ -569,7 +585,7 @@ useEffect(() => {
           transition={{ delay: 0.3, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Andi Ummu Aulia Ainundini Tenrigangka
+          Zumrotul khasanah,S.Sos
         </motion.h4>
         <motion.p
           className="text-sm text-white/80"
@@ -578,7 +594,7 @@ useEffect(() => {
           transition={{ delay: 0.4, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Putri dari <span className='font-semibold text-yellow-500'>Bapak Aferi Syamsidar Fudail</span> & <span className='font-semibold text-yellow-500'>Ibu Onny Tenriyana</span>
+          Putri dari <span className='font-semibold text-yellow-500'>Bapak Sutarmanto</span> & <span className='font-semibold text-yellow-500'>Ibu Mustomah</span>
         </motion.p>
       </motion.div>
 
@@ -591,7 +607,7 @@ useEffect(() => {
         viewport={{ once: false }}
       >
         <img
-          src="/dito1.jpg"
+          src="/vian.jpg"
           alt="Yohan Putra Nugraha"
           className="w-48 h-48 object-cover rounded-xl shadow-lg"
         />
@@ -602,7 +618,7 @@ useEffect(() => {
           transition={{ delay: 0.5, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Andhito Diaz Revandra
+           Muhammad alvian dwijaya
         </motion.h4>
         <motion.p
           className="text-sm text-white/80"
@@ -611,7 +627,7 @@ useEffect(() => {
           transition={{ delay: 0.6, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Putra dari <span className='font-semibold text-yellow-500'>Bapak Evansyah</span> & <span className='font-semibold text-yellow-500'>Ibu Dhyanchandra Patria Novimarmadewi</span>
+          Putra dari <span className='font-semibold text-yellow-500'>Bpk Sahri (alm)</span> & <span className='font-semibold text-yellow-500'>Ibu Siti kholinah</span>
         </motion.p>
       </motion.div>
     </div>
@@ -659,10 +675,10 @@ useEffect(() => {
         transition={{ duration: 0.8 }}
         viewport={{ once: false }}  // Animasi aktif setiap kali digulir
       >
-        <h4 className="text-base md:text-lg font-semibold mb-1">Rumah Pak Feri</h4>
+        <h4 className="text-base md:text-lg font-semibold mb-1">Rumah Mempelai wanita</h4>
         <p className="text-xs md:text-sm text-white/80 mb-3 leading-snug">
-          Tonjong, <br />
-          Kec. Tajur Halang, Kabupaten Bogor
+          RT01/07,Baleraksa, <br />
+          Kec.Karangmoncol , Kabupaten Purbalingga
         </p>
         <a
           href="https://maps.app.goo.gl/Nd4MGsK52M4WuNY66"
@@ -708,33 +724,35 @@ useEffect(() => {
       {[
         {
           title: "Episode 1: Pertemuan Pertama",
-          image: "/eps1.jpg",
+          image: "/e1.jpg",
           description:
-            "Ditengah kejenuhan menghadapi rutinitas, Dhito dan Dini dipertemukan dalam situasi dan waktu tak terduga...",
+            "Tidak ada yang kebetulan didunia ini, semua sudah tersusun rapi oleh sang maha kuasa. Kita tidak bisa memilih kepada siapa kita jatuh cinta. Uniknya kami berkenalan di sosial media dan pada akhirnya kami memutuskan untuk bertemu tatap muka pada bulan oktober 2024. Tidak ada yang pernah menyangka bahwa pertemuan didunia maya itu membawa kami pada suatu ikatan cinta yang suci hari ini",
           badge: "Eps 1",
           badgeColor: "bg-red-600",
         },
         {
           title: "Episode 2: Kencan Pertama",
-          image: "/eps2.jpg",
+          image: "/e2.jpg",
           description:
-            "Setelah proses perkenalan lebih dalam, keberanian Dhito mengajak Dini berkencan membuahkan hasil manis...",
+            "Katanya cinta tumbuh dengan kebersamaan. Seiring berjalannya waktu kami semakin dekat, saling bertukar cerita, saling support satu sama lain, dan alam seakan terus berkonspirasi untuk menyatukan kami berdua..",
+           
           badge: "Eps 2",
           badgeColor: "bg-blue-600",
         },
         {
           title: "Episode 3: Restu Keluarga",
-          image: "/eps3.jpg",
+          image: "/e3.jpg",
           description:
-            "Setelah perjalanan selama dua tahun, Dhito dan Dini memberanikan diri untuk berkenalan kepada orangtua...",
+            "Kehendaknya menuntun kami pada sebuah pertemuan yang tak pernah disangka hingga akhirnya membawa kami pada sebuah ikatan suci yang dicintainya, kami melangsungkan acara lamaran dibulan januari 2025 lalu...",
+
           badge: "Eps 3",
           badgeColor: "bg-green-600",
         },
         {
           title: "Episode 4: The End of Beginning",
-          image: "/eps4.jpg",
+          image: "/e4.jpg",
           description:
-            "Genap empat tahun penantian, akhirnya kapal mereka mulai berlayar, dipenuhi dengan dukungan dan doa...",
+            "Percayalah, bukan karna bertemu lalu berjodoh tapi karna berjodohlah kami dipertemukan, kami memutuskan untuk mengikrarkan janji suci pernikahan kami di bulan ini inshalloh sebagaimana yang pernah dikatakan oleh sayidina ali bin abi thalib 'apa yang menjadi takdirmu akan menemukan jalannya untuk menemukanmu'...",
           badge: "Eps 4",
           badgeColor: "bg-yellow-600",
         },
@@ -827,15 +845,15 @@ useEffect(() => {
 
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
       {[
-        { img: '/AdaApaDengan Cinta.png', badge: 'Eksklusif', badgeColor: 'bg-red-500' },
-        { img: '/CrashLandingOnYou.png', badge: 'Premium 👑', badgeColor: 'bg-red-500' },
-        { img: '/DDThe Explorer.png', badge: 'Top 10', badgeColor: 'bg-red-500' },
-        { img: '/DuaLatarBiru.png', badge: 'Premium 👑', badgeColor: 'bg-red-500' },
-        { img: '/KeluargaCemara.png', badge: 'Our Favorite', badgeColor: 'bg-red-500' },
-        { img: '/LaLaLand.png', badge: 'Eksklusif 10', badgeColor: 'bg-red-500' },
-        { img: '/NantiKitaCeritaTentangHariIni.png', badge: 'Top 5', badgeColor: 'bg-red-500' },
-        { img: '/PernikahanDini.png', badge: 'Top 3', badgeColor: 'bg-red-700' },
-        { img: '/ReadyOrNot.png', badge: 'Top 2', badgeColor: 'bg-pink-700' },
+        { img: '/2.png', badge: 'Eksklusif', badgeColor: 'bg-red-500' },
+        { img: '/3.png', badge: 'Premium 👑', badgeColor: 'bg-red-500' },
+        { img: '/4.png', badge: 'Top 10', badgeColor: 'bg-red-500' },
+        { img: '/5.png', badge: 'Premium 👑', badgeColor: 'bg-red-500' },
+        { img: '/6.png', badge: 'Our Favorite', badgeColor: 'bg-red-500' },
+        { img: '/7.png', badge: 'Eksklusif 10', badgeColor: 'bg-red-500' },
+        { img: '/8.png', badge: 'Top 5', badgeColor: 'bg-red-500' },
+        { img: '/9.png', badge: 'Top 3', badgeColor: 'bg-red-700' },
+        { img: '/10.png', badge: 'Top 2', badgeColor: 'bg-pink-700' },
         { img: '/WhenLifeGivesYouTangerines.png', badge: 'Top 1', badgeColor: 'bg-pink-500' },
       ].map((item, idx) => (
         <motion.div
@@ -883,7 +901,7 @@ useEffect(() => {
 </section>
 
 {/* section 8 */}
-<section className="bg-black text-white py-16 px-6 md:px-20">
+{/* <section className="bg-black text-white py-16 px-6 md:px-20">
   <motion.div
     className="max-w-xl mx-auto text-center"
     initial={{ opacity: 0, y: 30 }}
@@ -904,10 +922,79 @@ useEffect(() => {
       Konfirmasi Kehadiran
     </button>
   </motion.div>
+</section> */}
+
+{/* section 8 */}
+<section className="bg-black text-white py-16 px-6 md:px-20">
+  <motion.div
+    className="max-w-xl mx-auto text-center"
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    viewport={{ once: true }}
+  >
+    <h3 className="text-2xl md:text-3xl font-bold mb-6">Nomor Rekening 💳</h3>
+    <p className="text-sm md:text-base text-white/80 mb-6 leading-relaxed">
+      Untuk yang ingin memberikan tanda kasih, berikut nomor rekening kami.
+      Terima kasih banyak atas perhatian dan doa restunya ✨
+    </p>
+
+    {/* Nomor Rekening */}
+    <div className="bg-white text-black p-4 rounded-lg shadow mb-4">
+      <p className="text-lg font-semibold">BNI</p>
+      <p className="text-xl font-bold tracking-wider">1232516014</p>
+      <p className="text-sm text-gray-600">a.n Zumrotul khasanah</p>
+      <p className="text-lg font-semibold">BRI</p>
+      <p className="text-xl font-bold tracking-wider">041001021839506</p>
+      <p className="text-sm text-gray-600">a.n Zumrotul khasanah</p>
+      <p className="text-lg font-semibold">BCA</p>
+      <p className="text-xl font-bold tracking-wider">2310228071</p>
+      <p className="text-sm text-gray-600">a.n M Alvian dwijaya</p>
+      
+     
+     
+    </div>
+
+    {/* Tombol Salin */}
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText("1232516014");
+        alert("Nomor rekening berhasil disalin!");
+      }}
+      className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full shadow transition duration-300 mb-6"
+    >
+      Salin Nomor Rekening
+    </button>
+
+    {/* Alamat Kirim Hadiah */}
+    <div className="bg-gray-800 text-left p-6 rounded-lg shadow-lg mt-8">
+      <h4 className="text-lg font-bold mb-3">🎁 Alamat Kirim Hadiah</h4>
+      <p className="text-sm text-white/90 leading-relaxed">
+        Nama Penerima: <span className="font-semibold">Zumrotul khasanah</span>
+        <br />
+        Alamat: Baleraksa RT01/07, kec.karangmoncol, kabupaten purbalingga
+        provinsi jawa tengah,53355
+        <br />
+        No. HP: 0821-3190-7116
+      </p>
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(
+            "Nama: Pengantin A & B\nAlamat: Jl. Mawar No. 123, Kel. Melati, Kec. Sukajaya, Kota Yogyakarta, 55281\nNo. HP: 0812-3456-7890"
+          );
+          alert("Alamat hadiah berhasil disalin!");
+        }}
+        className="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-full shadow transition duration-300"
+      >
+        Salin Alamat
+      </button>
+    </div>
+  </motion.div>
 </section>
 
+
 {/* section 10 Form Ucapan & Daftar Wishes */}
-<section className="bg-black px-6 py-10 text-white text-center">
+ <section className="bg-black px-6 py-10 text-white text-center">
   <h3 className="text-2xl font-bold mb-6">Wish For The Couple </h3>
   <form
     onSubmit={(e) => {
@@ -939,10 +1026,10 @@ useEffect(() => {
     >
       Kirim Ucapan
     </button>
-  </form>
+  </form> 
 
  {/* Recent Wishes */}
-<div className="mt-10 max-w-2xl mx-auto">
+ <div className="mt-10 max-w-2xl mx-auto">
   <div className="max-h-96 overflow-y-scroll pr-2 space-y-4 ">
     {wishes.map((wish, i) => (
       <div
@@ -956,16 +1043,16 @@ useEffect(() => {
       </div>
     ))}
   </div>
-</div>
-
-
+</div> 
 </section>
+
+
 
 {/* section 11 penutup */}
 <section
   className="relative w-full text-white py-20 px-6 md:px-20 bg-center bg-cover overflow-hidden
              bg-scroll md:bg-fixed"
-  style={{ backgroundImage: "url('/prewed2.jpg')" }} // ganti dengan file final
+  style={{ backgroundImage: "url(/background.jpg')" }} // ganti dengan file final
 >
   {/* Overlay */}
   <div className="absolute inset-0 bg-black/70 z-0" />
