@@ -405,14 +405,14 @@ useEffect(() => {
 </div>
 
     <h1 className="text-3xl md:text-5xl font-extrabold leading-tigh lg:-ml-8">
-      Dhito & Dini: <br /> Sebelum Hari H
+      Zumrotul & vian: <br /> Sebelum Hari H
     </h1>
 
     <div className="flex items-center gap-3 mt-3 lg:-ml-8">
       <span className="bg-red-600 text-white text-xs md:text-sm px-3 py-1 rounded-full font-semibold shadow">
         Coming soon
       </span>
-      <span className="text-sm">•   06 Juli 2025</span>
+      <span className="text-sm">•   09 Oktober 2025</span>
     </div>
      {/* Kontrol Volume */}
       <div className="absolute top-4 right-4 z-20">
