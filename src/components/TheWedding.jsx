@@ -412,7 +412,7 @@ useEffect(() => {
       <span className="bg-red-600 text-white text-xs md:text-sm px-3 py-1 rounded-full font-semibold shadow">
         Coming soon
       </span>
-      <span className="text-sm">•   0 2025</span>
+      <span className="text-sm"> 09 Oktober  2025</span>
     </div>
      {/* Kontrol Volume */}
       <div className="absolute top-4 right-4 z-20">
@@ -585,7 +585,7 @@ useEffect(() => {
           transition={{ delay: 0.3, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Zumrotul khasanah,S.Sos
+          Zumrotul Khasanah,S.Sos
         </motion.h4>
         <motion.p
           className="text-sm text-white/80"
@@ -594,7 +594,7 @@ useEffect(() => {
           transition={{ delay: 0.4, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Putri dari <span className='font-semibold text-yellow-500'>Bapak Sutarmanto</span> & <span className='font-semibold text-yellow-500'>Ibu Mustomah</span>
+          Putri Pertama Dari <span className='font-semibold text-yellow-500'>Bapak Sutarmanto</span> & <span className='font-semibold text-yellow-500'>Ibu Mustomah</span>
         </motion.p>
       </motion.div>
 
@@ -618,7 +618,7 @@ useEffect(() => {
           transition={{ delay: 0.5, duration: 0.8 }}
           viewport={{ once: false }}
         >
-           Muhammad alvian dwijaya
+           Muhammad Alvian Dwijaya
         </motion.h4>
         <motion.p
           className="text-sm text-white/80"
@@ -627,7 +627,7 @@ useEffect(() => {
           transition={{ delay: 0.6, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Putra dari <span className='font-semibold text-yellow-500'>Bpk Sahri (alm)</span> & <span className='font-semibold text-yellow-500'>Ibu Siti kholinah</span>
+          Putra dari <span className='font-semibold text-yellow-500'>Bpk Sahri (Alm)</span> & <span className='font-semibold text-yellow-500'>Ibu Siti Kholinah</span>
         </motion.p>
         
       </motion.div>
@@ -792,7 +792,7 @@ useEffect(() => {
         },
         {
           title: "Episode 4: The End of Beginning",
-          image: "/biru1.jpg",
+          image: "/e4.jpg",
           description:
             "Percayalah, bukan karna bertemu lalu berjodoh tapi karna berjodohlah kami dipertemukan, kami memutuskan untuk mengikrarkan janji suci pernikahan kami di bulan ini inshalloh sebagaimana yang pernah dikatakan oleh sayidina ali bin abi thalib 'apa yang menjadi takdirmu akan menemukan jalannya untuk menemukanmu'...",
           badge: "Eps 4",
@@ -896,7 +896,7 @@ useEffect(() => {
         { img: '/8.png', badge: 'Top 5', badgeColor: 'bg-red-500' },
         { img: '/9.png', badge: 'Top 3', badgeColor: 'bg-red-700' },
         { img: '/10.png', badge: 'Top 2', badgeColor: 'bg-pink-700' },
-        { img: '/2.png', badge: 'Top 1', badgeColor: 'bg-pink-500' },
+        { img: '/1.jpg', badge: 'Top 1', badgeColor: 'bg-pink-500' },
       ].map((item, idx) => (
         <motion.div
           key={idx}
@@ -997,16 +997,6 @@ useEffect(() => {
      
     </div>
 
-    {/* Tombol Salin */}
-    <button
-      onClick={() => {
-        navigator.clipboard.writeText("1232516014");
-        alert("Nomor rekening berhasil disalin!");
-      }}
-      className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full shadow transition duration-300 mb-6"
-    >
-      Salin Nomor Rekening
-    </button>
 
     {/* Alamat Kirim Hadiah */}
     <div className="bg-gray-800 text-left p-6 rounded-lg shadow-lg mt-8">
@@ -1022,7 +1012,7 @@ useEffect(() => {
       <button
         onClick={() => {
           navigator.clipboard.writeText(
-            "Nama: Pengantin A & B\nAlamat: Jl. Mawar No. 123, Kel. Melati, Kec. Sukajaya, Kota Yogyakarta, 55281\nNo. HP: 0812-3456-7890"
+            "Nama: Zumrotul khasanah\nAlamat:Baleraksa RT01/07, kec.karangmoncol, kabupaten purbalingga provinsi jawa tengah,53355\nNo. HP: 0821-3190-7116"
           );
           alert("Alamat hadiah berhasil disalin!");
         }}
