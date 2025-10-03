@@ -768,7 +768,7 @@ useEffect(() => {
           title: "Episode 1: Pertemuan Pertama",
           image: "/e1.jpg",
           description:
-            "Tidak ada yang kebetulan didunia ini, semua sudah tersusun rapi oleh sang maha kuasa. Kita tidak bisa memilih kepada siapa kita jatuh cinta. Uniknya kami berkenalan di sosial media dan pada akhirnya kami memutuskan untuk bertemu tatap muka pada bulan oktober 2024. Tidak ada yang pernah menyangka bahwa pertemuan didunia maya itu membawa kami pada suatu ikatan cinta yang suci hari ini",
+            "Tidak ada yang kebetulan didunia ini, semua sudah tersusun rapi oleh sang maha kuasa. Kita tidak bisa memilih kepada siapa kita jatuh cinta. Uniknya kami berkenalan di sosial media dan pada akhirnya kami memutuskan untuk bertemu tatap muka pada bulan oktober 2024. Tidak ada yang pernah menyangka bahwa pertemuan didunia maya itu membawa kami pada suatu ikatan cinta yang suci ini",
           badge: "Eps 1",
           badgeColor: "bg-red-600",
         },
