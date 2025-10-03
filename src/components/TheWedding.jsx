@@ -405,14 +405,14 @@ useEffect(() => {
 </div>
 
     <h1 className="text-3xl md:text-5xl font-extrabold leading-tigh lg:-ml-8">
-      Zumrotul & vian: <br /> Sebelum Hari H
+      Zumrotul & Alvian: <br /> Sebelum Hari H
     </h1>
 
     <div className="flex items-center gap-3 mt-3 lg:-ml-8">
       <span className="bg-red-600 text-white text-xs md:text-sm px-3 py-1 rounded-full font-semibold shadow">
         Coming soon
       </span>
-      <span className="text-sm">•   09 Oktober 2025</span>
+      <span className="text-sm">•   0 2025</span>
     </div>
      {/* Kontrol Volume */}
       <div className="absolute top-4 right-4 z-20">
@@ -477,7 +477,7 @@ useEffect(() => {
       transition={{ duration: 1, delay: 0.4 }}
     >
       <p className="uppercase text-red-500 text-sm font-semibold tracking-wide">Documenter</p>
-      <h2 className="text-3xl md:text-4xl font-extrabold leading-snug">Vian & Asha: Sebelum Hari H</h2>
+      <h2 className="text-3xl md:text-4xl font-extrabold leading-snug">Alvian & Zumrotul: Sebelum Hari H</h2>
 
       <div className="flex items-center gap-4 text-sm text-white/80">
         <span className="text-green-400 font-semibold">100% Match</span>
@@ -491,7 +491,7 @@ useEffect(() => {
       </div>
 
       <p className="text-sm md:text-base text-white/80">
-        Dengan kuasa Allah SWT., Dini dan Dhito dipertemukan dalam situasi yang tepat. Arus membawa mereka ke jenjang yang lebih serius ketika keduanya bertekat untuk saling mengikat, menyempurnakan separuh agama.
+        Dengan kuasa Allah SWT., Zumrotul & alvian  dipertemukan dalam situasi yang tepat. Arus membawa mereka ke jenjang yang lebih serius ketika keduanya bertekat untuk saling mengikat, menyempurnakan separuh agama.
 
       </p>
 
@@ -629,10 +629,52 @@ useEffect(() => {
         >
           Putra dari <span className='font-semibold text-yellow-500'>Bpk Sahri (alm)</span> & <span className='font-semibold text-yellow-500'>Ibu Siti kholinah</span>
         </motion.p>
+        
       </motion.div>
+
     </div>
   </motion.div>
 </section>
+
+{/* Section Akad */}
+<section className="bg-black text-white py-16 px-6 md:px-20">
+  <div className="max-w-3xl mx-auto text-center">
+    <h2 className="text-3xl font-bold mb-6">Akad Nikah</h2>
+    <p className="mb-4 text-lg">
+      Dengan penuh rasa syukur, kami mengundang Anda untuk menyaksikan akad pernikahan kami.
+    </p>
+    <p className="mb-2">
+      🗓️ Tanggal: 09 Oktober 2025
+    </p>
+    <p className="mb-6">
+      ⏰ Waktu: 10.00 WIB s/d selesai
+    </p>
+  </div>
+</section>
+
+{/* Section Tasyakuran */}
+<section className="bg-black text-white py-16 px-6 md:px-20">
+  <div className="max-w-3xl mx-auto text-center">
+    <h2 className="text-3xl font-bold mb-6">Tasyakuran</h2>
+    <p className="mb-4 text-lg">
+      Bersama keluarga besar, kami mengundang Anda untuk hadir dalam acara tasyakuran pernikahan kami.
+    </p>
+    <p className="mb-2">
+      🗓️ Tanggal: 08 Oktober 2025
+    </p>
+    <p className="mb-6">
+      ⏰ Waktu: 08.00 WIB s/d selesai
+    </p>
+   
+  </div>
+</section>
+
+
+
+
+
+
+
 
 {/* section 5 */}
 <section className="bg-black text-white py-16 px-6 md:px-20">
@@ -681,7 +723,7 @@ useEffect(() => {
           Kec.Karangmoncol , Kabupaten Purbalingga
         </p>
         <a
-          href="https://maps.app.goo.gl/Nd4MGsK52M4WuNY66"
+          href="https://maps.app.goo.gl/kXNExiDotN8jskQP8"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block bg-white text-black px-4 py-1.5 rounded-full text-xs font-medium hover:bg-red-600 hover:text-white transition"
