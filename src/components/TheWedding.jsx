@@ -594,7 +594,7 @@ useEffect(() => {
           transition={{ delay: 0.4, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Putri Pertama Dari <span className='font-semibold text-yellow-500'>Bapak Sutarmanto</span> & <span className='font-semibold text-yellow-500'>Ibu Mustomah</span>
+          Putri Pertama Dari <span className='font-semibold text-yellow-500'>Bpk Sutarmanto</span> & <span className='font-semibold text-yellow-500'>Ibu Mustomah</span>
         </motion.p>
       </motion.div>
 
@@ -627,7 +627,7 @@ useEffect(() => {
           transition={{ delay: 0.6, duration: 0.8 }}
           viewport={{ once: false }}
         >
-          Putra dari <span className='font-semibold text-yellow-500'>Bpk Sahri (Alm)</span> & <span className='font-semibold text-yellow-500'>Ibu Siti Kholinah</span>
+          Putra Ke Dua dari <span className='font-semibold text-yellow-500'>Bpk Sahri (Alm)</span> & <span className='font-semibold text-yellow-500'>Ibu Siti Kholinah</span>
         </motion.p>
         
       </motion.div>
