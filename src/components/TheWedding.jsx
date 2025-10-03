@@ -700,8 +700,7 @@ useEffect(() => {
       >
         <iframe
           title="Lokasi Warna-Warni Resto"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.2643955185345!2d106.7594484!3d-6.488165899999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c3837c7a5057%3A0x5f75423673ba0355!2sRumah%20Pak%20Feri!5e0!3m2!1sen!2sid!4v1750087025165!5m2!1sen!2sid"
-          width="100%"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d309.0312353264198!2d109.45713137233967!3d-7.298633336693957!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6ff924bc7a337f%3A0x5027a76e3551b30!2sBaleraksa%2C%20Kec.%20Karangmoncol%2C%20Kabupaten%20Purbalingga%2C%20Jawa%20Tengah!5e0!3m2!1sid!2sid!4v1759472620828!5m2!1sid!2sid" 
           height="200"
           allowFullScreen=""
           loading="lazy"
